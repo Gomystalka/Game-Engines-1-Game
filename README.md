@@ -31,7 +31,9 @@
  N/A
 </ul>
 <h1>Screenshots</h1>
-<p>N/A</p>
+<ul>
+ N/A
+</ul>
  
  <h2>Well, I guess <a href="https://www.urbandictionary.com/define.php?term=Ganbaruby"><b>GanbaRuby</b></a> to me.</h2>
 <img src="https://media1.tenor.com/images/61bcbafc85870fdb1db95ac298f9b8f8/tenor.gif?itemid=7273202" width=50% height=50%/>
