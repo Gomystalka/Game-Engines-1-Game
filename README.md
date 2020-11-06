@@ -28,6 +28,7 @@
 <h1>Current Development Milestones</h1>
 <ul>
  <li>Project was created.</li>
+ <li>AudioBehaviour class created (Abstract class exposing certain methods and fields to aid visualization.)</li>
 </ul>
 <h1>Gameplay Demo</h1>
 <i>To be populated by a video showcasing the gameplay...</i>
