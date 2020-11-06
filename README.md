@@ -4,6 +4,7 @@
 <p>Unity Version: <b>Unity 2019.4.1f1</b>
 <p>This project is being made for educational purposes only.</p>
 <p>Any credits will be made within the game and on this repository</p>
+<p><b>ALL</b> assets so far are mine (scripts, models, etc)</p>
 
 <h1>Game Idea Overview</h1>
 <p>This'll be a bullet-hell 3D game for which the enemies and certain parts of the map will be either randomly generated, generated based off spectrum data from an audio file of choice or preset but will react to music. The surrounding landscape will also change based on the audio file provided. The player will have two modes, auto play for visualization purposes and manual mode for gameplay. The music will be freely interchangable by the player/user and most of the map will be generated as the music plays. There will be a length restriction placed on the imported audio file as to avoid both too long and too short clips. Multiplayer might be added if I find a way to implement it into this idea. This assignment will be developed through the use of the <b>Unity 2019.4.1f1</b> Game Engine.</p>
