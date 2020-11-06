@@ -1,5 +1,5 @@
 <h1>Game Engines 1 Assignment</h1>
-<h2>Tomasz Galka - C18740411</h2>
+<h2>C18740411</h2>
 
 <p>Unity Version: <b>Unity 2019.4.1f1</b>
 <p>This project is being made for educational purposes only.</p>
