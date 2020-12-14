@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Visualizer : AudioBehaviour
 {
-    //[SynchronizedVar(Target = "source")]
     [Header("Gizmos")]
     public float scale;
     public float spacing;
@@ -15,31 +14,9 @@ public class Visualizer : AudioBehaviour
     public float frequencyLow, frequencyHigh;
     public bool useScalar;
 
-    [Header("Player")]
-    public Transform friend;
-    public float speed;
-    public float gravity;
-    public float groundLevel;
-    public Vector2 shakeRangeX;
-    public Vector2 shakeRangeZ;
-    public float timeoutSeconds = 1.5f;
-
-    private float _timer;
-    private Vector3 _oldPosition;
-
-    [Gay] public int yes;
-
     public override void OnEnable()
     {
         base.OnEnable();
-        _timer = 0f;
-        if (friend)
-            _oldPosition = friend.position;
-    }
-
-    private void Start()
-    {
-
     }
 
     private void OnDrawGizmos()
@@ -73,35 +50,6 @@ public class Visualizer : AudioBehaviour
     public override void Update()
     {
         base.Update();
-        if (!friend) return;
-        Vector3 position = friend.position;
-
-        if (position.y > groundLevel)
-            position.y -= gravity * Time.deltaTime;
-        else
-            position.y = groundLevel;
-
-        float avg = GetAverageFrequencyInRange(frequencyLow, frequencyHigh, useScalar);
-        Debug.Log(avg);
-        if (avg >= threshold)
-        {
-            _timer = 0f;
-            position.y += speed * Time.deltaTime;
-            ShakePlayer(ref position);
-        }
-
-        if (_timer >= timeoutSeconds)
-            friend.position = _oldPosition;
-        else
-            _timer += Time.deltaTime;
-
-        friend.transform.position = position;
     }
-
-    private void ShakePlayer(ref Vector3 position) =>
-        position = new Vector3(_oldPosition.x + Random.Range(shakeRangeX.x, shakeRangeX.y),
-            _oldPosition.y,
-            _oldPosition.z + Random.Range(shakeRangeZ.x, shakeRangeZ.y));
-
     //44100 / 
 }

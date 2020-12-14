@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Reflection;
 
-[CustomEditor(typeof(AudioBehaviour), true)]
+[CustomEditor(typeof(AudioManager), true)]
 public class AudioBehaviourInspector : Editor
 {
     public const float kElementSpace = 12f;
@@ -42,7 +42,7 @@ public class AudioBehaviourInspector : Editor
                 richText = true,
                 alignment = TextAnchor.MiddleCenter
             };
-        AudioBehaviour a = (AudioBehaviour)target;
+        AudioManager a = (AudioManager)target;
         EditorGUILayout.PropertyField(_audioSourceProperty);
         if (a && a.source)
         {
