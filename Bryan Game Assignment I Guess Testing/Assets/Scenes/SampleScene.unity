@@ -776,6 +776,7 @@ MonoBehaviour:
   sampleScalar: 10
   source: {fileID: 1795203630}
   lowestFrequency: 24
+  volume: 2.55
   useMicrophoneInput: 0
   microphoneAudioClipLength: 12
   mainMixerGroup: {fileID: 24300002, guid: 47585daab33bfa944b810dae5d4de567, type: 2}

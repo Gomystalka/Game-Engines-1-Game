@@ -53,4 +53,6 @@ public abstract class AudioBehaviour : MonoBehaviour
     //No null check for maximum performance
     protected void GetAverageFrequencyInRange(float lowestFrequency, float highestFrequency, bool useScalar = false) =>
         ManagerInstance.GetAverageFrequencyInRange(lowestFrequency, highestFrequency, useScalar);
+
+    public void SetVolume(float volume) => ManagerInstance.SetVolume(volume);
 }

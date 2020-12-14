@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.Audio;
 
 public sealed class AudioManager : MonoBehaviour {
+    public const string kVisualizationVolume = "VisualizationVolume";
+
     [Header("Audio")]
     public int sampleCount;
     public FFTWindow fftType;
@@ -11,6 +13,7 @@ public sealed class AudioManager : MonoBehaviour {
     public float sampleScalar;
     public AudioSource source;
     public float lowestFrequency = 24f;
+    [Range(0.001f, 3f)] public float volume = 2.718f; //2.718 = +20Db
 
     [Header("Microphone Input")]
     public bool useMicrophoneInput;
@@ -42,6 +45,8 @@ public sealed class AudioManager : MonoBehaviour {
             Destroy(this);
             return;
         }
+        if (volumeIndependentMixerGroup)
+            SetVolume(volume);
     }
 
     private void OnEnable() {
@@ -89,6 +94,7 @@ public sealed class AudioManager : MonoBehaviour {
         PreFFTSpectrumData = new float[sampleCount];
         source.GetSpectrumData(PreFFTSpectrumData, 0, fftType);
         FindFrequencyBands();
+        SetVolume(volume);
     }
 
     public void ResetSpectrum()
@@ -163,6 +169,11 @@ public sealed class AudioManager : MonoBehaviour {
         for (int i = startIndex; i <= endIndex; i++)
             average += PreFFTSpectrumData[i] * scalar;
         return average / (endIndex - startIndex + 1);
+    }
+
+    public void SetVolume(float volume) {
+        volume = Mathf.Clamp(volume, 0.001f, 10f);
+        volumeIndependentMixerGroup.audioMixer.SetFloat(kVisualizationVolume, Mathf.Log(volume) * 20f);
     }
 }
 
