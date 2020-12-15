@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
+[DefaultExecutionOrder(-10)]
 public sealed class AudioManager : MonoBehaviour {
     public const string kVisualizationVolume = "VisualizationVolume";
 
@@ -31,7 +31,7 @@ public sealed class AudioManager : MonoBehaviour {
     public FrequencyBand[] FrequencyBands { get { return _frequencyBands ?? new FrequencyBand[0]; } }
     public AudioClip Clip { get { return source?.clip; } }
     public static int SampleRate { get { return AudioSettings.outputSampleRate; } }
-    public float[] PreFFTSpectrumData { get; private set; }
+    public float[] FFTSpectrumData { get; private set; }
 
     public static AudioManager Instance;
 
@@ -91,8 +91,8 @@ public sealed class AudioManager : MonoBehaviour {
     {
         if (!source) return;
         sampleCount = Mathf.ClosestPowerOfTwo(sampleCount);
-        PreFFTSpectrumData = new float[sampleCount];
-        source.GetSpectrumData(PreFFTSpectrumData, 0, fftType);
+        FFTSpectrumData = new float[sampleCount];
+        source.GetSpectrumData(FFTSpectrumData, 0, fftType);
         FindFrequencyBands();
         SetVolume(volume);
     }
@@ -101,7 +101,7 @@ public sealed class AudioManager : MonoBehaviour {
     {
         if (!source) return;
         source.Stop();
-        PreFFTSpectrumData = new float[sampleCount];
+        FFTSpectrumData = new float[sampleCount];
         _frequencyBands = new FrequencyBand[(int)(Mathf.Log(sampleCount) / Mathf.Log(2f))];
         source.Play();
     }
@@ -140,7 +140,7 @@ public sealed class AudioManager : MonoBehaviour {
             int e = s + s + 1;
             float avg = 0f;
             for (int k = s; k < e; k++)
-                avg += PreFFTSpectrumData[s] * (k + 1);
+                avg += FFTSpectrumData[s] * (k + 1);
             avg /= s + 1;
 
             FrequencyBand band = _frequencyBands[i];
@@ -167,7 +167,7 @@ public sealed class AudioManager : MonoBehaviour {
         float average = 0f;
         float scalar = useScalar ? sampleScalar : 1f;
         for (int i = startIndex; i <= endIndex; i++)
-            average += PreFFTSpectrumData[i] * scalar;
+            average += FFTSpectrumData[i] * scalar;
         return average / (endIndex - startIndex + 1);
     }
 
@@ -221,6 +221,10 @@ public static class Extensions {
         foreach (float t in arr)
             c += t;
         return c;
+    }
+
+    public static float CalculateAverage(this float[] arr) {
+        return arr.SumOf() / arr.Length;
     }
 
     public static bool IsWhole(this float f) {

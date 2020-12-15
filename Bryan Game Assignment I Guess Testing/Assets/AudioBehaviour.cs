@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+//Abstract wrapper for scene AudioManager fields and methods
 public abstract class AudioBehaviour : MonoBehaviour
 {
     protected AudioManager ManagerInstance { get; private set; }
@@ -18,7 +17,7 @@ public abstract class AudioBehaviour : MonoBehaviour
     protected AudioClip Clip { get { return ManagerInstance.Clip; } }
     protected int SampleRate { get { return AudioManager.SampleRate; } }
     protected float HalfSampleRate { get { return AudioManager.SampleRate / 2f; } }
-    protected float[] PreFFTSpectrumData { get { return ManagerInstance.PreFFTSpectrumData; } }
+    protected float[] FFTSpectrumData { get { return ManagerInstance.FFTSpectrumData; } }
 
     private bool _behaviourReady;
 
