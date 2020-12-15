@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class GAME : MonoBehaviour
 {
-    [Gay] public bool hitler;
+    [Gay] public bool testVar;
 }
