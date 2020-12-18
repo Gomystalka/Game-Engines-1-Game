@@ -105,7 +105,7 @@ public class Player : MonoBehaviour
 
         if (_currentTarget) return;
 
-        if (Physics.Raycast(_targetCrosshairParent.position, targetCrosshair.forward, out RaycastHit hit, targettingRange, targetMask))
+        if (Physics.Raycast(_targetCrosshairParent.position, _targetCrosshairParent.forward, out RaycastHit hit, targettingRange, targetMask))
         { //Target found
             _currentTarget = hit.transform.GetComponent<Target>();
             targetCrosshair.SetParent(null, true);
