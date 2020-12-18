@@ -132,7 +132,7 @@ public class Player : MonoBehaviour
                 _lockedOn = false;
                 OnTargetLost();
             }
-            targetCrosshair.localPosition = Vector3.MoveTowards(targetCrosshair.localPosition, Vector3.zero, lockOnSpeed * Time.deltaTime);
+            targetCrosshair.localPosition = Vector3.MoveTowards(targetCrosshair.localPosition, Vector3.zero + (Vector3.forward * 3f), lockOnSpeed * Time.deltaTime);
         }
     }
 
