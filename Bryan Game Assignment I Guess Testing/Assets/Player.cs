@@ -37,6 +37,8 @@ public class Player : MonoBehaviour
         _playerMesh = GetComponentInChildren<MeshRenderer>().transform;
         _currentForwardSpeed = initialForwardSpeed;
         _targetCrosshairSprite = targetCrosshair.GetComponent<SpriteRenderer>();
+        _targetCrosshairBillboard = targetCrosshair.GetComponent<Billboard>();
+        _targetCrosshairParent = targetCrosshair.parent;
     }
 
     void Update()
@@ -90,7 +92,8 @@ public class Player : MonoBehaviour
     private Target _currentTarget;
     private bool _lockedOn;
     private SpriteRenderer _targetCrosshairSprite;
-    private Transform _oldTargetParent;
+    private Billboard _targetCrosshairBillboard;
+    private Transform _targetCrosshairParent;
     public float lockedOnSizePx = 150f;
 
     private void FireTargettingRay() {
@@ -102,11 +105,11 @@ public class Player : MonoBehaviour
 
         if (_currentTarget) return;
 
-        if (Physics.Raycast(targetCrosshair.position, targetCrosshair.forward, out RaycastHit hit, targettingRange, targetMask))
-        {
+        if (Physics.Raycast(_targetCrosshairParent.position, targetCrosshair.forward, out RaycastHit hit, targettingRange, targetMask))
+        { //Target found
             _currentTarget = hit.transform.GetComponent<Target>();
-            _oldTargetParent = targetCrosshair.parent;
             targetCrosshair.SetParent(null, true);
+            _targetCrosshairBillboard.enabled = true;
         }
     }
 
@@ -141,7 +144,8 @@ public class Player : MonoBehaviour
     private void OnTargetLost() {
         if (_targetCrosshairSprite)
             _targetCrosshairSprite.color = Color.white;
-        targetCrosshair.SetParent(_oldTargetParent, true);
+        _targetCrosshairBillboard.enabled = false;
+        targetCrosshair.SetParent(_targetCrosshairParent, true);
         targetCrosshair.localScale = Vector3.one;
         targetCrosshair.localEulerAngles = Vector3.zero;
     }

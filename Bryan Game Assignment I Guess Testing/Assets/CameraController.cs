@@ -14,7 +14,8 @@ public class CameraController : MonoBehaviour
     private void LateUpdate()
     {
         if (!target) return;
-        transform.localPosition = Vector3.SmoothDamp(transform.localPosition, target.localPosition + offset, ref _vel, Mathf.Clamp01(smoothing));
+        //transform.localPosition = Vector3.Lerp(transform.localPosition, target.localPosition + offset, smoothing * Time.deltaTime);
+        //transform.localPosition = Vector3.SmoothDamp(transform.localPosition, target.localPosition + offset, ref _vel, smoothing * Time.deltaTime);
         //transform.localPosition = transform.localPosition.ClampXY(-motionLimits.x, motionLimits.x, -motionLimits.y, motionLimits.y);
     }
 }
