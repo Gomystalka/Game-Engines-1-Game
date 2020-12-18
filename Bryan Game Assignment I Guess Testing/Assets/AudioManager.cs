@@ -288,6 +288,40 @@ public static class Extensions {
             vectors.Add(Vector3.one);
         return vectors.ToArray();
     }
+
+    public static Vector3[] CalculateFrustumCorners(this Camera camera, float depth)
+    {
+        if (!camera) return null;
+        depth = Mathf.Clamp(depth, camera.nearClipPlane, camera.farClipPlane);
+        Vector3[] corners = new Vector3[4];
+
+        for (int x = 0; x < 2; x++)
+        {
+            for (int y = 0; y < 2; y++)
+            {
+                corners[x * 2 + y] = camera.ViewportToWorldPoint(new Vector3(x, y, depth));
+            }
+        }
+
+        return corners;
+    }
+
+    public static bool IsMostlyNegative(this Vector3 vector) {
+        return vector.x <= 0f && vector.z <= 0f;
+    }
+
+    public static Vector3 Clamp(this Vector3 v, float xMin, float xMax, float yMin, float yMax, float zMin, float zMax) {
+        return new Vector3(Mathf.Clamp(v.x, xMin, xMax), Mathf.Clamp(v.y, yMin, yMax), Mathf.Clamp(v.z, zMin, zMax));
+    }
+
+    public static Vector3 ClampXY(this Vector3 v, float xMin, float xMax, float yMin, float yMax)
+    {
+        return new Vector3(Mathf.Clamp(v.x, xMin, xMax), Mathf.Clamp(v.y, yMin, yMax), v.z);
+    }
+
+    public static bool CanSee(this Camera camera, Bounds bounds) {
+        return GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(camera), bounds);
+    }
 }
 
 public struct Bonanza
