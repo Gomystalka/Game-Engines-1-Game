@@ -19075,11 +19075,11 @@ MonoBehaviour:
   width: 128
   height: 256
   spacing: {x: 2, y: 1, z: 2}
-  respawnOffset: {x: 0, y: 0, z: 256.8}
+  respawnOffset: {x: 0, y: 0, z: 256}
   respawnOffsetDirection: {x: 1, y: 0, z: 0}
   player: {fileID: 29602712}
   respawnThresholdCheckResetTime: 2
-  gizmoHeightOffset: -49.93
+  gizmoHeightOffset: 0
 --- !u!23 &1920084563
 MeshRenderer:
   m_ObjectHideFlags: 0

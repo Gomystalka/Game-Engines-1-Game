@@ -11,12 +11,6 @@ public class CustomTerrain : MonoBehaviour
     public int height;
     public Vector3 spacing;
 
-    [Header("Terrain Respawning")]
-    public Vector3 respawnOffset;
-    public Vector3 respawnOffsetDirection;
-    public Transform player;
-    public float respawnThresholdCheckResetTime = 2f;
-
     [Header("Gizmos")]
     public float gizmoHeightOffset;
 
@@ -24,8 +18,6 @@ public class CustomTerrain : MonoBehaviour
     private MeshRenderer _renderer;
     private Vector3[] _vertices;
     private int[] _tris;
-    private float _dist;
-    private bool _canRespawn = true;
 
     private void OnEnable()
     {
@@ -75,6 +67,20 @@ public class CustomTerrain : MonoBehaviour
         return m;
     }
 
+    public void SetVertexHeight(int index, float newHeight) {
+        Vector3 v = _vertices[index];
+        _vertices[index] = new Vector3(v.x, newHeight, v.z);
+    }
+
+    public void ApplyVertexChanges() {
+        Mesh m = _filter.sharedMesh;
+        m.vertices = _vertices;
+        //m.triangles = _tris;
+        m.RecalculateTangents();
+        m.RecalculateNormals();
+        m.RecalculateBounds();
+    }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
@@ -82,11 +88,5 @@ public class CustomTerrain : MonoBehaviour
         float h = height * spacing.z;
         Vector3 offsetPos = transform.position + new Vector3(w / 2f, 0f, (h / 2f));
         Gizmos.DrawWireCube(offsetPos, new Vector3(w, 1f, h));
-        Gizmos.color = Color.blue;
-        Vector3 destination = transform.position + respawnOffset + (transform.TransformDirection(respawnOffsetDirection) * w);
-        Gizmos.DrawLine(transform.position + respawnOffset, destination);
-        Gizmos.color = Color.magenta;
-        if (player)
-            Gizmos.DrawLine(new Vector3(player.position.x, destination.y, player.position.z), new Vector3(player.position.x, destination.y, destination.z));
     }
 }
