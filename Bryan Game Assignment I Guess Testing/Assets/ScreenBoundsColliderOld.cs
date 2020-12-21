@@ -140,7 +140,9 @@ public class ScreenBoundsColliderOld : MonoBehaviour
         Gizmos.color = Color.yellow;
 
         for (int i = 0; i < FrustumCorners.Length; i++) {
+#if UNITY_EDITOR
             UnityEditor.Handles.Label(FrustumCorners[i] + Vector3.up * 2f, $"I: {i}");
+#endif
             Gizmos.DrawSphere(FrustumCorners[i], 0.2f);
         }
         Gizmos.color = Color.magenta;

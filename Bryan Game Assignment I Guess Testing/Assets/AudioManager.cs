@@ -57,7 +57,6 @@ public sealed class AudioManager : MonoBehaviour {
             Debug.LogWarning($"[{GetType().FullName}] Audio Source component is missing. This AudioBehaviour will not function!");
         sampleCount = Mathf.ClosestPowerOfTwo(sampleCount);
         _frequencyBands = new FrequencyBand[(int)(Mathf.Log(sampleCount) / Mathf.Log(2f))];
-
         if (useMicrophoneInput)
             SetAudioDevice(0);
         else

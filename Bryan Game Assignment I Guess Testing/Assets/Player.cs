@@ -152,7 +152,9 @@ public class Player : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+#if UNITY_EDITOR
         UnityEditor.Handles.Label(transform.position + Vector3.up * 1.4f, $"MAG: {(Vector3)_axes * _currentForwardSpeed * Time.deltaTime}");
+#endif
     }
 }
 
