@@ -76,14 +76,42 @@ public class VisualizedCustomTerrain : AudioBehaviour
             Gizmos.DrawLine(new Vector3(player.position.x, destination.y, player.position.z), new Vector3(player.position.x, destination.y, destination.z));
 
         Gizmos.color = Color.cyan;
-        float one = w / chunkCount;
-        for (int x = 1; x < chunkCount; x++) {
-            Gizmos.DrawLine(transform.position + new Vector3(one * x, 0f, 0f), transform.position + new Vector3(one * x, 0f, h));
-        }
-        one = h / chunkCount;
-        for (int y = 1; y < chunkCount; y++) {
-            Gizmos.DrawLine(transform.position + new Vector3(0f, 0f, one * y), transform.position + new Vector3(w, 0f, one * y));
+        for(int y = 0; y < chunkCount + 1; y++)
+        {
+            for (int x = 0; x < chunkCount + 1; x++)
+            {
+                float oneWSpaced = w / chunkCount;
+                float oneHSpaced = h / chunkCount;
+                float oneW = _terrain.width / chunkCount;
+                float oneH = _terrain.height / chunkCount;
+                if(y == 0)
+                    Gizmos.DrawLine(transform.position + new Vector3(0f, 0f, x * oneHSpaced), transform.position + new Vector3(w, 0f, x * oneHSpaced));
+                if(x == 0)
+                    Gizmos.DrawLine(transform.position + new Vector3(y * oneWSpaced, 0f, 0f), transform.position + new Vector3(y * oneWSpaced, 0f, h));
 
+                int index = (int)((x * oneW) * (_terrain.width + 1) + (y * oneH));
+                if (_terrain && _terrain.Vertices != null && _terrain.Vertices.Length > 0) {
+                        Gizmos.DrawSphere(_terrain.transform.TransformPoint(_terrain.Vertices[index]), 5f);
+                }
+
+            }
         }
+
+
+        /*
+        float one = w / chunkCount;
+        for (int x = 0; x < chunkCount + 1; x++) {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position + new Vector3(one * x, 0f, 0f), transform.position + new Vector3(one * x, 0f, h));
+
+            int xIndex = ((_terrain.width / chunkCount) * x) % _terrain.width;
+
+            Gizmos.color = Color.cyan;
+            if (_terrain && _terrain.Vertices != null && _terrain.Vertices.Length > 0)
+                Gizmos.DrawSphere(_terrain.transform.TransformPoint(_terrain.Vertices[xIndex]), 5f);
+        }
+        Gizmos.color = Color.green;
+        */
+
     }
 }
