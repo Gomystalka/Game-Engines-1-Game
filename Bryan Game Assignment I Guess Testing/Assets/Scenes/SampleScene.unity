@@ -19074,8 +19074,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 256
   height: 256
-  spacing: {x: 2.37, y: 1, z: 2.65}
-  gizmoHeightOffset: 0
+  spacing: {x: 2, y: 1, z: 3}
+  chunkCornerSize: 10
+  chunkSize: 3
+  drawChunks: 1
+  chunks: []
+  v: {x: 0, y: 0}
 --- !u!23 &1920084563
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -19153,7 +19157,6 @@ MonoBehaviour:
   respawnOffsetDirection: {x: 1, y: 0, z: 0}
   player: {fileID: 29602712}
   respawnThresholdCheckResetTime: 10
-  chunkCount: 3
 --- !u!1 &1921006578
 GameObject:
   m_ObjectHideFlags: 0
