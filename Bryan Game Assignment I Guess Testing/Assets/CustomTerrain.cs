@@ -167,8 +167,18 @@ public class CustomTerrain : MonoBehaviour
                 Gizmos.color = Color.magenta;
             }
             //Gizmos.DrawSphere(LocalVertexToWorldSpace(chunks[1].Center.x, chunks[1].Center.y), chunkCornerSize);
-
+            Gizmos.DrawSphere(LocalVertexToWorldSpace(PopulateChunk(4, v.x, v.y, 100f)), chunkCornerSize);
         }
+    }
+
+    public Vector2Int PopulateChunk(int chunkIndex, int x, int y, float height) {
+        if (chunkIndex < chunks.Length) {
+            Chunk c = chunks[chunkIndex];
+            Vector2Int mappedPoint = c.MapToChunkBounds(x, y);
+
+            return mappedPoint;
+        }
+        return Vector2Int.zero;
     }
 
     public int ToSingleIndex(int x, int y)
@@ -182,6 +192,11 @@ public class CustomTerrain : MonoBehaviour
 
     public Vector3 LocalVertexToWorldSpace(int x, int y) {
         return LocalVertexToWorldSpace(y * (height + 1) + x);
+    }
+
+    public Vector3 LocalVertexToWorldSpace(Vector2Int point)
+    {
+        return LocalVertexToWorldSpace(point.x, point.y);
     }
 }
 
@@ -244,5 +259,9 @@ public class Chunk {
         point.x = Mathf.Clamp(point.x, MinX, MaxX);
         point.y = Mathf.Clamp(point.y, MinY, MaxY);
         return point;
+    }
+
+    public Vector2Int MapToChunkBounds(int x, int y) {
+        return ClampToChunkRange(MinX + x, MinY + y);
     }
 }

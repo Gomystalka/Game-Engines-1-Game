@@ -19153,7 +19153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96258e5abe6932643bdeac3b9ea9ef7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  respawnOffset: {x: 0, y: 0, z: 116.84}
+  respawnOffset: {x: 0, y: 0, z: 379.72}
   respawnOffsetDirection: {x: 1, y: 0, z: 0}
   player: {fileID: 29602712}
   respawnThresholdCheckResetTime: 10
