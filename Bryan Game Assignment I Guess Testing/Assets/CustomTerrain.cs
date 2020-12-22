@@ -160,13 +160,13 @@ public class CustomTerrain : MonoBehaviour
                 //Gizmos.DrawSphere(LocalVertexToWorldSpace(c.topLeft), chunkCornerSize);
                 //Gizmos.DrawSphere(LocalVertexToWorldSpace(c.topRight), chunkCornerSize);
 #if UNITY_EDITOR
-                UnityEditor.Handles.Label(LocalVertexToWorldSpace(chunks[ch].bottomLeft), $"CHUNK INDEX: {ch}");
+                UnityEditor.Handles.Label(LocalVertexToWorldSpace(chunks[ch].Center.x, chunks[ch].Center.y), $"CHUNK INDEX: {ch}");
 #endif
                 //Gizmos.color = Color.red;
                 //Gizmos.DrawSphere(LocalVertexToWorldSpace((int)chunks[ch].bottomLeftPoint.x, (int)chunks[ch].bottomLeftPoint.y), chunkCornerSize);
                 Gizmos.color = Color.magenta;
             }
-            //Gizmos.DrawSphere(LocalVertexToWorldSpace(v.x, v.y), chunkCornerSize);
+            //Gizmos.DrawSphere(LocalVertexToWorldSpace(chunks[1].Center.x, chunks[1].Center.y), chunkCornerSize);
 
         }
     }
@@ -197,4 +197,52 @@ public class Chunk {
     public Vector2Int topRightPoint;
     public int width;
     public int height;
+
+    public int MinX
+    {
+        get
+        {
+            return bottomLeftPoint.x;
+        }
+    }
+
+    public int MaxX {
+        get {
+            return bottomRightPoint.x;
+        }
+    }
+
+    public int MinY
+    {
+        get
+        {
+            return bottomLeftPoint.y;
+        }
+    }
+
+    public int MaxY
+    {
+        get
+        {
+            return topLeftPoint.y;
+        }
+    }
+
+    public Vector2Int Center {
+        get {
+            return new Vector2Int(MaxX - (width / 2), MaxY - (height / 2));
+        }
+    }
+
+    public Vector2Int ClampToChunkRange(int x, int y) {
+        x = Mathf.Clamp(x, MinX, MaxX);
+        y = Mathf.Clamp(y, MinY, MaxY);
+        return new Vector2Int(x, y);
+    }
+
+    public Vector2Int ClampToChunkRange(Vector2Int point) {
+        point.x = Mathf.Clamp(point.x, MinX, MaxX);
+        point.y = Mathf.Clamp(point.y, MinY, MaxY);
+        return point;
+    }
 }
