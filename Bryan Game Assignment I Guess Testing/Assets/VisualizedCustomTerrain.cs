@@ -22,6 +22,7 @@ public class VisualizedCustomTerrain : AudioBehaviour
     public float wireThicknessRate = 10f;
     public int wireFrequencyBandIndex = 0;
     public float scaledBeatStrengthThreshold;
+    public float wireColorIntensity;
 
     public override void OnEnable()
     {
@@ -33,13 +34,15 @@ public class VisualizedCustomTerrain : AudioBehaviour
     }
 
     private void OnBeat(float instantEnergy, float averageLocalEnergy, float cxa) {
+        /*
         float scaledCxa = cxa * 1000f;
         if (_terrain && _terrain.Renderer && scaledCxa >= scaledBeatStrengthThreshold)
         {
             Material mat = _terrain.Renderer.material;
             Debug.Log($"BEAT: I: {instantEnergy} | AVG: {averageLocalEnergy} | CxA: {scaledCxa}");
-            mat.SetFloat("_WireThickness", mat.GetFloat("_MaxThickness") * 0.85f);
+            mat.SetFloat("_WireThickness", mat.GetFloat("_MaxThickness") * wireScalar);
         }
+        */
     }
 
     public override void Update()
@@ -57,7 +60,16 @@ public class VisualizedCustomTerrain : AudioBehaviour
         if (_terrain && _terrain.Renderer)
         {
             Material mat = _terrain.Renderer.material;
-            mat.SetFloat("_WireThickness", Mathf.Lerp(mat.GetFloat("_WireThickness"), 0f, Time.deltaTime * wireThicknessRate));
+            float a = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                FrequencyBand b = FrequencyBands[i];
+                a += b.frequency;
+            }
+            float thickness = Mathf.Clamp(a / 3 * wireScalar, 0f, mat.GetFloat("_MaxThickness") - 200f);
+            float h = Utilities.MapRange(thickness, 0f, mat.GetFloat("_MaxThickness") - 200f, 0f, 1f);
+            mat.SetFloat("_WireThickness", Mathf.Lerp(mat.GetFloat("_WireThickness"), thickness, Time.deltaTime * wireThicknessRate));
+            mat.SetColor("_WireColor", Color.Lerp(mat.GetColor("_WireColor"), Color.HSVToRGB(1f - h, 1f, 1f, true) * wireColorIntensity, Time.deltaTime * wireThicknessRate));
         }
     }
 

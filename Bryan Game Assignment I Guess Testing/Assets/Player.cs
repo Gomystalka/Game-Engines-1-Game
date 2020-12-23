@@ -23,6 +23,7 @@ public class Player : MonoBehaviour
     private float _currentForwardSpeed;
     private Vector2 _axes;
     private Camera _camera;
+    private CannonController _cannonController;
 
     public bool IsCrosshairMoving { get { return _axes.magnitude >= axisDeadZone; } }
 
@@ -39,6 +40,7 @@ public class Player : MonoBehaviour
         _targetCrosshairSprite = targetCrosshair.GetComponent<SpriteRenderer>();
         _targetCrosshairBillboard = targetCrosshair.GetComponent<Billboard>();
         _targetCrosshairParent = targetCrosshair.parent;
+        _cannonController = GetComponent<CannonController>();
     }
 
     void Update()
@@ -56,6 +58,9 @@ public class Player : MonoBehaviour
 
         FireTargettingRay();
         UpdateCrosshair();
+
+        if (_cannonController && Input.GetButton("Fire1"))
+            _cannonController.FireProjectile();
     }
 
     private void ApplyRoll() {

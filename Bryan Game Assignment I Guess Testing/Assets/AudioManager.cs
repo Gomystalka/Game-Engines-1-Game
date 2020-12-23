@@ -277,11 +277,11 @@ public sealed class AudioManager : MonoBehaviour {
         _historyBuffer = _shiftedHistoryBuffer;
         _shiftedHistoryBuffer = null;
 
-        if (_beatDetectionTime - _energyBeatTimer > -beatSensitivity && diff2 > 0f) {
+        if (_beatDetectionTime - _energyBeatTimer > beatSensitivity && diff2 > 0f) {
             onBeatDetected?.Invoke(i, a, c * a);
             _energyBeatTimer = _beatDetectionTime;
         }
-        _beatDetectionTime += FFTSpectrumDataChannel0.Length / SampleRate;
+        _beatDetectionTime += (FFTSpectrumDataChannel0.Length / SampleRate) * 2f;
     }
 
     private float GetSpectrumAverage()
