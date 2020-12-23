@@ -26,6 +26,16 @@ public class CustomTerrain : MonoBehaviour
 
     public Vector2Int v;
 
+    [Header("Mirror Settings")]
+    public bool enableMirror;
+    public Vector3 mirrorScale;
+    public Vector3 mirrorPositionOffset;
+
+    private GameObject _mirrorObject;
+    private MeshRenderer _mirrorRenderer;
+    private MeshFilter _mirrorFilter;
+    private MeshCollider _mirrorCollider;
+
     private void OnEnable()
     {
         _filter = GetComponent<MeshFilter>();
@@ -33,6 +43,14 @@ public class CustomTerrain : MonoBehaviour
         _filter.mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         _filter.mesh = GeneratePlaneMesh();
         RecalculateChunks();
+        CreateMirror();
+    }
+
+    private void Update()
+    {
+        if (!enableMirror) return;
+        _mirrorObject.transform.position = transform.position + mirrorPositionOffset;
+        _mirrorObject.transform.localScale = mirrorScale;
     }
 
     private Mesh GeneratePlaneMesh() {
@@ -87,6 +105,9 @@ public class CustomTerrain : MonoBehaviour
         m.RecalculateTangents();
         m.RecalculateNormals();
         m.RecalculateBounds();
+
+        if (enableMirror)
+            _mirrorFilter.sharedMesh = m;
     }
 
     public void RecalculateChunks() {
@@ -127,6 +148,12 @@ public class CustomTerrain : MonoBehaviour
         Vector3 offsetPos = transform.position + new Vector3(w / 2f, 0f, (h / 2f));
         Gizmos.DrawWireCube(offsetPos, new Vector3(w, 1f, h));
 
+        if (enableMirror)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube(offsetPos + mirrorPositionOffset, new Vector3(w, 1f, h));
+        }
+
         if (!drawChunks) return;
         Gizmos.color = Color.cyan;
         for (int y = 0; y < chunkSize + 1; y++)
@@ -145,14 +172,14 @@ public class CustomTerrain : MonoBehaviour
 
                 int index = (int)((x * oneW) * (width + 1) + (y * oneH));
                 //if (Vertices != null && Vertices.Length > 0)
-                    //Gizmos.DrawSphere(transform.TransformPoint(Vertices[index]), 5f);
+                //Gizmos.DrawSphere(transform.TransformPoint(Vertices[index]), 5f);
             }
         }
 
         Gizmos.color = Color.red;
         if (chunks != null && Vertices != null && Vertices.Length > 0)
         {
-            
+
             for (int ch = 0; ch < chunks.Length; ch++)
             {
                 //Gizmos.DrawSphere(LocalVertexToWorldSpace(c.bottomLeft), chunkCornerSize);
@@ -215,6 +242,19 @@ public class CustomTerrain : MonoBehaviour
                 Vertices[replaceeIndex] = replacedVertex;
             }
         }
+    }
+
+    private void CreateMirror() {
+        if (_mirrorObject || !enableMirror) return;
+        _mirrorObject = new GameObject($"Mirrored {name}");
+        _mirrorObject.transform.SetParent(transform, true);
+        _mirrorObject.transform.position = transform.position + mirrorPositionOffset;
+        _mirrorFilter = _mirrorObject.AddComponent<MeshFilter>();
+        _mirrorRenderer = _mirrorObject.AddComponent<MeshRenderer>();
+        _mirrorCollider = _mirrorObject.AddComponent<MeshCollider>();
+        _mirrorFilter.sharedMesh = _filter.sharedMesh;
+        _mirrorRenderer.sharedMaterials = _renderer.sharedMaterials;
+        _mirrorCollider.sharedMesh = _mirrorFilter.sharedMesh;
     }
 
 }

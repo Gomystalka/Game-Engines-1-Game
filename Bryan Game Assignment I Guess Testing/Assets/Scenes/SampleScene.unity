@@ -19080,6 +19080,9 @@ MonoBehaviour:
   drawChunks: 1
   chunks: []
   v: {x: 0, y: 0}
+  enableMirror: 1
+  mirrorScale: {x: 1, y: 1, z: 1}
+  mirrorPositionOffset: {x: 0, y: 200, z: 0}
 --- !u!23 &1920084563
 MeshRenderer:
   m_ObjectHideFlags: 0
