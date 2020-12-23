@@ -17956,9 +17956,10 @@ MonoBehaviour:
     type: 2}
   volumeIndependentMixerGroup: {fileID: 7624705813433875257, guid: 47585daab33bfa944b810dae5d4de567,
     type: 2}
-  beatStrengthThresholdMultiplier: 1.5
+  beatStrengthThresholdMultiplier: 1
   algorithm: 1
-  previousSampleCount: 50
+  beatSensitivity: 0.5
+  previousSampleCount: 48
   beatDetectionThresholdMultiplier: 1.5
 --- !u!4 &1795203632
 Transform:
@@ -19316,7 +19317,7 @@ MonoBehaviour:
   heightScalar: 40
   perlinNoiseZoom: {x: 0.1, y: 0.1}
   wireScalar: 1
-  wireThicknessRate: 0.8
+  wireThicknessRate: 0.5
   wireFrequencyBandIndex: 0
   scaledBeatStrengthThreshold: 0
 --- !u!1 &1921006578

@@ -41,7 +41,7 @@ public sealed class AudioManager : MonoBehaviour {
 
     [Header("Beat Detection")]
     public float beatStrengthThresholdMultiplier = 1.5f;
-    public BeatDetectionAlgorithm algorithm = BeatDetectionAlgorithm.CConstant;
+    public BeatDetectionAlgorithm algorithm = BeatDetectionAlgorithm.FrequencyEnergy;
 
     private void Awake()
     {
@@ -106,18 +106,18 @@ public sealed class AudioManager : MonoBehaviour {
         sampleCount = Mathf.ClosestPowerOfTwo(sampleCount);
         FFTSpectrumDataChannel0 = new float[sampleCount];
 
-        if (algorithm == BeatDetectionAlgorithm.CConstant) //Only gather second channel data with the CConstant Algorithm
+        if (algorithm == BeatDetectionAlgorithm.FrequencyEnergy) //Only gather second channel data with the CConstant Algorithm
             FFTSpectrumDataChannel1 = new float[sampleCount];
 
         source.GetSpectrumData(FFTSpectrumDataChannel0, 0, fftType);
 
-        if (algorithm == BeatDetectionAlgorithm.CConstant)
+        if (algorithm == BeatDetectionAlgorithm.FrequencyEnergy)
             source.GetSpectrumData(FFTSpectrumDataChannel1, 1, fftType);
 
         FindFrequencyBands();
         SmoothenFrequencyBands();
         SetVolume(volume);
-        if (algorithm == BeatDetectionAlgorithm.CConstant)
+        if (algorithm == BeatDetectionAlgorithm.FrequencyEnergy)
             UpdateCConstantBeatDetection();
         else
             UpdateSpectralFluxBeatDetection();
@@ -225,7 +225,11 @@ public sealed class AudioManager : MonoBehaviour {
     }
 
     #region CConstant Beat Detection
+    [Header("Energy Frequency Beat Detection")]
+    public float beatSensitivity;
     private float[] _historyBuffer;
+    private float _energyBeatTimer;
+    private float _beatDetectionTime;
 
     private void OnEnableCConstantBeatDetection()
     {
@@ -261,8 +265,9 @@ public sealed class AudioManager : MonoBehaviour {
         float i = CalculateInstantEnergy();
         float a = CalculateAverageLocalEnergy();
         float v = CalculateEnergyVariance(a);
-
         float c = (-0.0025714f * v) + 1.5142857f;
+        float diff = Mathf.Max(0f, i - c * a);
+        float diff2 = Mathf.Max(0f, diff - GetSpectrumAverage());
         float[] _shiftedHistoryBuffer = _historyBuffer;
 
         for (int b = 0; b < _historyBuffer.Length - 1; b++)
@@ -272,8 +277,30 @@ public sealed class AudioManager : MonoBehaviour {
         _historyBuffer = _shiftedHistoryBuffer;
         _shiftedHistoryBuffer = null;
 
-        if (i > c * a)
+        if (_beatDetectionTime - _energyBeatTimer > -beatSensitivity && diff2 > 0f) {
             onBeatDetected?.Invoke(i, a, c * a);
+            _energyBeatTimer = _beatDetectionTime;
+        }
+        _beatDetectionTime += FFTSpectrumDataChannel0.Length / SampleRate;
+    }
+
+    private float GetSpectrumAverage()
+    {
+        float avg = 0;
+        float num = 0;
+        for (int i = 0; i < _historyBuffer.Length; i++)
+        {
+            if (_historyBuffer[i] > 0)
+            {
+                avg += _historyBuffer[i];
+                num++;
+            }
+        }
+        if (num > 0)
+        {
+            avg /= num;
+        }
+        return avg;
     }
 
     public class BeatEvent : UnityEvent<float, float, float> {
@@ -360,7 +387,11 @@ public sealed class AudioManager : MonoBehaviour {
         public float value;
         public float threshold;
         public float offset;
-    } 
+    }
+
+    #endregion
+
+    #region Frequency Energy Beat Detection
 
     #endregion
 }
@@ -454,5 +485,5 @@ public struct Range {
 
 public enum BeatDetectionAlgorithm {
     SpectralFlux,
-    CConstant
+    FrequencyEnergy
 }
