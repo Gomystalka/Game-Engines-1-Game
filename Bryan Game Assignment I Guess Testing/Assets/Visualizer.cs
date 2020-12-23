@@ -21,7 +21,7 @@ public class Visualizer : AudioBehaviour
 
     private void OnDrawGizmos()
     {
-        /*
+        if (!ManagerInstance || FrequencyBands == null) return;
         for (int s = 0; s < FrequencyBands.Length; s++) {
             float freq = FrequencyBands[s].smoothedFrequency;
             Gizmos.color = Color.HSVToRGB(1f / FrequencyBands.Length * s, 1f, 1f);
@@ -44,7 +44,7 @@ public class Visualizer : AudioBehaviour
             //Gizmos.color = Color.red;
             //Gizmos.DrawCube(transform.position + new Vector3(pos.x, FrequencyBands[s].maxFrequency - scale), new Vector3(scale, scale, scale));
         }
-        */
+
     }
 
     public override void Update()

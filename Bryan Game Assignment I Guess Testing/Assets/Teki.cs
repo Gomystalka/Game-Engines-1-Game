@@ -70,7 +70,7 @@ public class Teki : AudioBehaviour
         if (Capturing)
         {
             _framesBetweenCaptures++;
-            _currentAverage += FFTSpectrumData.CalculateAverage() * independentSampleScalar;
+            _currentAverage += FFTSpectrumDataLeft.CalculateAverage() * independentSampleScalar;
         }
             //_dataCaptureTimer.WaitForTimer(Time.deltaTime);
         //}

@@ -1,12 +1,13 @@
 ﻿// Unity built-in shader source. Copyright (c) 2016 Unity Technologies. MIT license (see license.txt)
 //Based on the SpatialMapping/WireFrame shader.
 //Modified by Tomasz Galka. 
-// -Added _Color, _WireColor, _MainTex, _TexScale and _EdgeDetectionThreshold. Removed Spatial Mapping functionality. Acts as a wireframe shader.
+// -Added _Color, _WireColor, _MainTex, _TexScale, _EdgeDetectionThreshold and _MaxThickness. Removed Spatial Mapping functionality. Acts as a wireframe shader.
 Shader "Tom/Wireframe"
 {
 	Properties
 	{
-		_WireThickness("Wire Thickness", RANGE(0, 800)) = 100
+		_WireThickness("Wire Thickness", Float) = 100
+		_MaxThickness ("Max Wire Thickness", Float) = 800
 		[HDR] _Color ("Base Color", Color) = (1, 1, 1, 1)
 		[HDR] _WireColor("Wire Color", Color) = (1, 1, 1, 1)
 		_MainTex("Texture", 2D) = "white" {}
@@ -30,6 +31,7 @@ Shader "Tom/Wireframe"
 		#include "UnityCG.cginc"
 
 		float _WireThickness;
+		float _MaxThickness;
 		float4 _Color;
 		float4 _WireColor;
 		sampler2D _MainTex;
@@ -86,7 +88,7 @@ Shader "Tom/Wireframe"
 			// divided by 2.  However we can avoid dividing our area/base by 2
 			// since our cross product will already be double our area.
 			float area = abs(edge1.x * edge2.y - edge1.y * edge2.x);
-			float wireThickness = 800 - _WireThickness;
+			float wireThickness = _MaxThickness - _WireThickness;
 
 			g2f o;
 			o.worldSpacePosition = i[0].worldSpacePosition;

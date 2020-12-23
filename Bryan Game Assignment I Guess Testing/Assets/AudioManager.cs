@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.Events;
 
 [DefaultExecutionOrder(-10)]
 public sealed class AudioManager : MonoBehaviour {
@@ -31,9 +32,14 @@ public sealed class AudioManager : MonoBehaviour {
     public FrequencyBand[] FrequencyBands { get { return _frequencyBands ?? new FrequencyBand[0]; } }
     public AudioClip Clip { get { return source?.clip; } }
     public static int SampleRate { get { return AudioSettings.outputSampleRate; } }
-    public float[] FFTSpectrumData { get; private set; }
+    public float[] FFTSpectrumDataLeft { get; private set; }
+    public float[] FFTSpectrumDataRight { get; private set; }
+    public BeatEvent onBeatDetected;
 
     public static AudioManager Instance;
+
+    [Header("Beat Detection")]
+    public float beatStrengthThresholdMultiplier = 1.5f;
 
     private void Awake()
     {
@@ -61,6 +67,7 @@ public sealed class AudioManager : MonoBehaviour {
             SetAudioDevice(0);
         else
             source.outputAudioMixerGroup = volumeIndependentMixerGroup;
+        OnEnableBeatDetection();
     }
 
     public void SetAudioDevice(int deviceIndex) {
@@ -90,17 +97,20 @@ public sealed class AudioManager : MonoBehaviour {
     {
         if (!source) return;
         sampleCount = Mathf.ClosestPowerOfTwo(sampleCount);
-        FFTSpectrumData = new float[sampleCount];
-        source.GetSpectrumData(FFTSpectrumData, 0, fftType);
+        FFTSpectrumDataLeft = new float[sampleCount];
+        FFTSpectrumDataRight = new float[sampleCount];
+        source.GetSpectrumData(FFTSpectrumDataLeft, 0, fftType);
+        source.GetSpectrumData(FFTSpectrumDataRight, 1, fftType);
         FindFrequencyBands();
         SetVolume(volume);
+        UpdateBeatDetection();
     }
 
     public void ResetSpectrum()
     {
         if (!source) return;
         source.Stop();
-        FFTSpectrumData = new float[sampleCount];
+        FFTSpectrumDataLeft = new float[sampleCount];
         _frequencyBands = new FrequencyBand[(int)(Mathf.Log(sampleCount) / Mathf.Log(2f))];
         source.Play();
     }
@@ -139,13 +149,13 @@ public sealed class AudioManager : MonoBehaviour {
             int e = s + s + 1;
             float avg = 0f;
             for (int k = s; k < e; k++)
-                avg += FFTSpectrumData[s] * (k + 1);
+                avg += FFTSpectrumDataLeft[s] * (k + 1);
             avg /= s + 1;
 
             FrequencyBand band = _frequencyBands[i];
             band.frequencyRange = new Range(s * hzPerBin, e * hzPerBin);
             band.frequency = avg * sampleScalar;
-            band.smoothedFrequency = Mathf.MoveTowards(band.smoothedFrequency, band.frequency, frequencySmoothing);
+            band.smoothedFrequency = Mathf.MoveTowards(band.smoothedFrequency, band.frequency, frequencySmoothing * Time.deltaTime);
 
             if (band.frequency > band.maxFrequency)
                 band.maxFrequency = band.frequency;
@@ -166,7 +176,7 @@ public sealed class AudioManager : MonoBehaviour {
         float average = 0f;
         float scalar = useScalar ? sampleScalar : 1f;
         for (int i = startIndex; i <= endIndex; i++)
-            average += FFTSpectrumData[i] * scalar;
+            average += FFTSpectrumDataLeft[i] * scalar;
         return average / (endIndex - startIndex + 1);
     }
 
@@ -174,6 +184,63 @@ public sealed class AudioManager : MonoBehaviour {
         volume = Mathf.Clamp(volume, 0.001f, 10f);
         volumeIndependentMixerGroup.audioMixer.SetFloat(kVisualizationVolume, Mathf.Log(volume) * 20f);
     }
+
+    #region Beat Detection
+    private float[] _historyBuffer;
+
+    private void OnEnableBeatDetection()
+    {
+        _historyBuffer = new float[Mathf.FloorToInt(SampleRate / sampleCount)];
+        onBeatDetected = new BeatEvent();
+    }
+
+    private float CalculateInstantEnergy() {
+        float e = 0;
+
+        for (int i = 0; i < sampleCount; i++)
+            e += Mathf.Pow(FFTSpectrumDataLeft[i], 2f) + Mathf.Pow(FFTSpectrumDataRight[i], 2f);
+        return e;
+    }
+
+    private float CalculateAverageLocalEnergy() {
+        float avgE = 0f;
+        for (int i = 0; i < _historyBuffer.Length; i++) {
+            avgE += _historyBuffer[i] * beatStrengthThresholdMultiplier;
+        }
+        return avgE / _historyBuffer.Length;
+    }
+
+    private float CalculateEnergyVariance(float averageEnergy) {
+        float variance = 0f;
+        for (int i = 0; i < _historyBuffer.Length; i++)
+            variance += Mathf.Pow(_historyBuffer[i] - averageEnergy, 2f);
+
+        return variance / _historyBuffer.Length;
+    }
+
+    private void UpdateBeatDetection() {
+        float i = CalculateInstantEnergy();
+        float a = CalculateAverageLocalEnergy();
+        float v = CalculateEnergyVariance(a);
+
+        float c = (-0.0025714f * v) + 1.5142857f;
+        float[] _shiftedHistoryBuffer = _historyBuffer;
+
+        for (int b = 0; b < _historyBuffer.Length - 1; b++)
+            _shiftedHistoryBuffer[b + 1] = _historyBuffer[b];
+
+        _shiftedHistoryBuffer[0] = i;
+        _historyBuffer = _shiftedHistoryBuffer;
+        _shiftedHistoryBuffer = null;
+
+        if (i > c * a)
+            onBeatDetected?.Invoke(i, a, c * a);
+    }
+
+    public class BeatEvent : UnityEvent<float, float, float> {
+        //Stub
+    }
+    #endregion
 }
 
 public class Timer {

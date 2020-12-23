@@ -48,7 +48,7 @@ public class VisualizedTerrain : AudioBehaviour
 
     private void GenerateVisualizedHeight()
     {
-        int bandFactor = Mathf.FloorToInt(FFTSpectrumData.Length / FrequencyBands.Length);
+        int bandFactor = Mathf.FloorToInt(FFTSpectrumDataLeft.Length / FrequencyBands.Length);
         for (int y = 0; y < length; y++)
         {
             for (int i = 0; i < width; i++)

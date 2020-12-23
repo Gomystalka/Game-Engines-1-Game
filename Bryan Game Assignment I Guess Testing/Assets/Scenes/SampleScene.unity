@@ -17824,6 +17824,7 @@ GameObject:
   - component: {fileID: 1795203631}
   - component: {fileID: 1795203630}
   - component: {fileID: 1795203633}
+  - component: {fileID: 1795203634}
   m_Layer: 0
   m_Name: Music Manager
   m_TagString: Untagged
@@ -17842,7 +17843,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 7624705813433875257, guid: 47585daab33bfa944b810dae5d4de567,
     type: 2}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 0ca31943f954c8944943d7283e17456b, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -17940,10 +17941,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84d3e34241b9bbf448c27bb2485ae62e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sampleCount: 256
+  sampleCount: 512
   fftType: 5
-  frequencySmoothing: 0.64
-  sampleScalar: 10
+  frequencySmoothing: 1
+  sampleScalar: 100
   source: {fileID: 1795203630}
   lowestFrequency: 24
   volume: 0.9
@@ -17954,6 +17955,7 @@ MonoBehaviour:
     type: 2}
   volumeIndependentMixerGroup: {fileID: 7624705813433875257, guid: 47585daab33bfa944b810dae5d4de567,
     type: 2}
+  beatStrengthThresholdMultiplier: 1
 --- !u!4 &1795203632
 Transform:
   m_ObjectHideFlags: 0
@@ -17975,7 +17977,7 @@ VideoPlayer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1795203629}
-  m_Enabled: 1
+  m_Enabled: 0
   m_VideoClip: {fileID: 32900000, guid: 1fa395da1880e5e48ab22263dcc2e792, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
@@ -18002,6 +18004,25 @@ VideoPlayer:
   m_Looping: 0
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
+--- !u!114 &1795203634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795203629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cecfdd8315774364694ccd25a9036a86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scale: 1
+  spacing: 0
+  frequencyRangeLabelOffset: {x: 0, y: 0, z: 0}
+  threshold: 0
+  frequencyLow: 0
+  frequencyHigh: 0
+  useScalar: 0
 --- !u!1 &1800955050
 GameObject:
   m_ObjectHideFlags: 0
@@ -19290,6 +19311,9 @@ MonoBehaviour:
   respawnThresholdCheckResetTime: 0.5
   heightScalar: 40
   perlinNoiseZoom: {x: 0.1, y: 0.1}
+  wireScalar: 1
+  wireThicknessRate: 0.8
+  wireFrequencyBandIndex: 0
 --- !u!1 &1921006578
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,12 +17,28 @@ public class VisualizedCustomTerrain : AudioBehaviour
     private CustomTerrain _terrain;
     private bool _canRespawn = true;
 
+    [Header("Visualization Settings")]
+    public float wireScalar = 1000f;
+    public float wireThicknessRate = 10f;
+    public int wireFrequencyBandIndex = 0;
+
     public override void OnEnable()
     {
         base.OnEnable();
         _terrain = GetComponent<CustomTerrain>();
         _canRespawn = true;
         GenerateVisualizedHeight(true);
+        OnBeatDetected.AddListener(OnBeat);
+    }
+
+    private void OnBeat(float instantEnergy, float averageLocalEnergy, float cxa) {
+        float scaledCxa = cxa * 1000f;
+        if (_terrain && _terrain.Renderer && scaledCxa > 1.5f)
+        {
+            Material mat = _terrain.Renderer.material;
+            Debug.Log($"BEAT: I: {instantEnergy} | AVG: {averageLocalEnergy} | CxA: {scaledCxa}");
+            mat.SetFloat("_WireThickness", mat.GetFloat("_MaxThickness") * 0.85f);
+        }
     }
 
     public override void Update()
@@ -37,7 +53,11 @@ public class VisualizedCustomTerrain : AudioBehaviour
         if (dist * (dot < 0 ? -1f : 1f) <= 0f && _canRespawn)
             OnRespawnThresholdReached();
         //_yIndex = _yIndex + 1 < length ? _yIndex + 1 : 0;
-
+        if (_terrain && _terrain.Renderer)
+        {
+            Material mat = _terrain.Renderer.material;
+            mat.SetFloat("_WireThickness", Mathf.Lerp(mat.GetFloat("_WireThickness"), 0f, Time.deltaTime * wireThicknessRate));
+        }
     }
 
     private void OnRespawnThresholdReached()

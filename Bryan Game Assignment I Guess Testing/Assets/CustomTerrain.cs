@@ -15,7 +15,7 @@ public class CustomTerrain : MonoBehaviour
     public float chunkCornerSize = 10f;
 
     private MeshFilter _filter;
-    private MeshRenderer _renderer;
+    public MeshRenderer Renderer { get; private set; }
     public Vector3[] Vertices { get; private set; }
     private int[] _tris;
 
@@ -39,7 +39,7 @@ public class CustomTerrain : MonoBehaviour
     private void OnEnable()
     {
         _filter = GetComponent<MeshFilter>();
-        _renderer = GetComponent<MeshRenderer>();
+        Renderer = GetComponent<MeshRenderer>();
         _filter.mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         _filter.mesh = GeneratePlaneMesh();
         RecalculateChunks();
@@ -257,7 +257,7 @@ public class CustomTerrain : MonoBehaviour
         _mirrorRenderer = _mirrorObject.AddComponent<MeshRenderer>();
         _mirrorCollider = _mirrorObject.AddComponent<MeshCollider>();
         _mirrorFilter.sharedMesh = _filter.sharedMesh;
-        _mirrorRenderer.sharedMaterials = _renderer.sharedMaterials;
+        _mirrorRenderer.sharedMaterials = Renderer.sharedMaterials;
         _mirrorCollider.sharedMesh = _mirrorFilter.sharedMesh;
     }
 
