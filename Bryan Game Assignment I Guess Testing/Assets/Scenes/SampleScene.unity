@@ -17843,7 +17843,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 7624705813433875257, guid: 47585daab33bfa944b810dae5d4de567,
     type: 2}
-  m_audioClip: {fileID: 8300000, guid: 0ca31943f954c8944943d7283e17456b, type: 3}
+  m_audioClip: {fileID: 8300000, guid: d438a1ce4a34cdb4dbe94af7966e8c9b, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -17943,8 +17943,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sampleCount: 512
   fftType: 5
-  frequencySmoothing: 1
-  sampleScalar: 100
+  frequencySmoothing: 0.005
+  frequencySmoothingMultiplier: 1.2
+  sampleScalar: 10
   source: {fileID: 1795203630}
   lowestFrequency: 24
   volume: 0.9
@@ -17955,7 +17956,10 @@ MonoBehaviour:
     type: 2}
   volumeIndependentMixerGroup: {fileID: 7624705813433875257, guid: 47585daab33bfa944b810dae5d4de567,
     type: 2}
-  beatStrengthThresholdMultiplier: 1
+  beatStrengthThresholdMultiplier: 1.5
+  algorithm: 1
+  previousSampleCount: 50
+  beatDetectionThresholdMultiplier: 1.5
 --- !u!4 &1795203632
 Transform:
   m_ObjectHideFlags: 0
@@ -19314,6 +19318,7 @@ MonoBehaviour:
   wireScalar: 1
   wireThicknessRate: 0.8
   wireFrequencyBandIndex: 0
+  scaledBeatStrengthThreshold: 0
 --- !u!1 &1921006578
 GameObject:
   m_ObjectHideFlags: 0

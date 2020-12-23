@@ -21,6 +21,7 @@ public class VisualizedCustomTerrain : AudioBehaviour
     public float wireScalar = 1000f;
     public float wireThicknessRate = 10f;
     public int wireFrequencyBandIndex = 0;
+    public float scaledBeatStrengthThreshold;
 
     public override void OnEnable()
     {
@@ -33,7 +34,7 @@ public class VisualizedCustomTerrain : AudioBehaviour
 
     private void OnBeat(float instantEnergy, float averageLocalEnergy, float cxa) {
         float scaledCxa = cxa * 1000f;
-        if (_terrain && _terrain.Renderer && scaledCxa > 1.5f)
+        if (_terrain && _terrain.Renderer && scaledCxa >= scaledBeatStrengthThreshold)
         {
             Material mat = _terrain.Renderer.material;
             Debug.Log($"BEAT: I: {instantEnergy} | AVG: {averageLocalEnergy} | CxA: {scaledCxa}");

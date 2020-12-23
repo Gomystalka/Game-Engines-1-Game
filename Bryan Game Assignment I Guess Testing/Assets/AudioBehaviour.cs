@@ -17,8 +17,8 @@ public abstract class AudioBehaviour : MonoBehaviour
     protected AudioClip Clip { get { return ManagerInstance.Clip; } }
     protected int SampleRate { get { return AudioManager.SampleRate; } }
     protected float HalfSampleRate { get { return AudioManager.SampleRate / 2f; } }
-    protected float[] FFTSpectrumDataLeft { get { return ManagerInstance.FFTSpectrumDataLeft; } }
-    protected float[] FFTSpectrumDataRight { get { return ManagerInstance.FFTSpectrumDataRight; } }
+    protected float[] FFTSpectrumDataChannel0 { get { return ManagerInstance.FFTSpectrumDataChannel0; } }
+    protected float[] FFTSpectrumDataChannel1 { get { return ManagerInstance.FFTSpectrumDataChannel1; } }
     protected AudioManager.BeatEvent OnBeatDetected { get { return ManagerInstance.onBeatDetected; } }
 
     private bool _behaviourReady;

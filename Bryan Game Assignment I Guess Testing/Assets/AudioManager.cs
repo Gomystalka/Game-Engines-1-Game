@@ -10,7 +10,8 @@ public sealed class AudioManager : MonoBehaviour {
     [Header("Audio")]
     public int sampleCount;
     public FFTWindow fftType;
-    public float frequencySmoothing;
+    [Range(0.0001f, 0.5f)]public float frequencySmoothing = 0.01f;
+    public float frequencySmoothingMultiplier = 1.2f;
     public float sampleScalar;
     public AudioSource source;
     public float lowestFrequency = 24f;
@@ -32,14 +33,15 @@ public sealed class AudioManager : MonoBehaviour {
     public FrequencyBand[] FrequencyBands { get { return _frequencyBands ?? new FrequencyBand[0]; } }
     public AudioClip Clip { get { return source?.clip; } }
     public static int SampleRate { get { return AudioSettings.outputSampleRate; } }
-    public float[] FFTSpectrumDataLeft { get; private set; }
-    public float[] FFTSpectrumDataRight { get; private set; }
+    public float[] FFTSpectrumDataChannel0 { get; private set; }
+    public float[] FFTSpectrumDataChannel1 { get; private set; }
     public BeatEvent onBeatDetected;
 
     public static AudioManager Instance;
 
     [Header("Beat Detection")]
     public float beatStrengthThresholdMultiplier = 1.5f;
+    public BeatDetectionAlgorithm algorithm = BeatDetectionAlgorithm.CConstant;
 
     private void Awake()
     {
@@ -67,7 +69,12 @@ public sealed class AudioManager : MonoBehaviour {
             SetAudioDevice(0);
         else
             source.outputAudioMixerGroup = volumeIndependentMixerGroup;
-        OnEnableBeatDetection();
+
+        //Both should still be initialized to allow Runtime switching of Algorithms
+        FFTSpectrumDataChannel0 = new float[sampleCount];
+        FFTSpectrumDataChannel1 = new float[sampleCount];
+        OnEnableCConstantBeatDetection();
+        OnEnableSpectralFluxBeatDetection();
     }
 
     public void SetAudioDevice(int deviceIndex) {
@@ -82,7 +89,7 @@ public sealed class AudioManager : MonoBehaviour {
             source.outputAudioMixerGroup = audioDeviceInputGroup;
 
         source.Stop();
-        if(Microphone.IsRecording(CurrentAudioDevice))
+        if (Microphone.IsRecording(CurrentAudioDevice))
             Microphone.End(CurrentAudioDevice);
         if (deviceIndex < 0) deviceIndex = 0;
         if (deviceIndex >= devices.Length) deviceIndex = devices.Length - 1;
@@ -97,22 +104,57 @@ public sealed class AudioManager : MonoBehaviour {
     {
         if (!source) return;
         sampleCount = Mathf.ClosestPowerOfTwo(sampleCount);
-        FFTSpectrumDataLeft = new float[sampleCount];
-        FFTSpectrumDataRight = new float[sampleCount];
-        source.GetSpectrumData(FFTSpectrumDataLeft, 0, fftType);
-        source.GetSpectrumData(FFTSpectrumDataRight, 1, fftType);
+        FFTSpectrumDataChannel0 = new float[sampleCount];
+
+        if (algorithm == BeatDetectionAlgorithm.CConstant) //Only gather second channel data with the CConstant Algorithm
+            FFTSpectrumDataChannel1 = new float[sampleCount];
+
+        source.GetSpectrumData(FFTSpectrumDataChannel0, 0, fftType);
+
+        if (algorithm == BeatDetectionAlgorithm.CConstant)
+            source.GetSpectrumData(FFTSpectrumDataChannel1, 1, fftType);
+
         FindFrequencyBands();
+        SmoothenFrequencyBands();
         SetVolume(volume);
-        UpdateBeatDetection();
+        if (algorithm == BeatDetectionAlgorithm.CConstant)
+            UpdateCConstantBeatDetection();
+        else
+            UpdateSpectralFluxBeatDetection();
     }
 
     public void ResetSpectrum()
     {
         if (!source) return;
         source.Stop();
-        FFTSpectrumDataLeft = new float[sampleCount];
+        FFTSpectrumDataChannel0 = new float[sampleCount];
         _frequencyBands = new FrequencyBand[(int)(Mathf.Log(sampleCount) / Mathf.Log(2f))];
         source.Play();
+    }
+
+    private void SmoothenFrequencyBands() {
+        for (int i = 0; i < _frequencyBands.Length; ++i) {
+            FrequencyBand band = _frequencyBands[i];
+            if (band.frequency > band.smoothedFrequency)
+            {
+                band.smoothedFrequency = band.frequency;
+                band.smoothing = frequencySmoothing;
+            }
+
+            if (band.frequency < band.smoothedFrequency)
+            {
+                band.smoothedFrequency -= band.smoothing;
+                band.smoothing *= frequencySmoothingMultiplier;
+                if (band.smoothing < 0) band.smoothing = 0;
+            }
+
+            if (band.frequency > band.maxFrequency)
+                band.maxFrequency = band.frequency;
+
+            band.mappedFrequency = band.frequency / band.maxFrequency;
+            band.smoothedMappedFrequency = band.smoothedFrequency / band.maxFrequency;
+            _frequencyBands[i] = band;
+        }
     }
 
     private void FindFrequencyBands()
@@ -120,7 +162,7 @@ public sealed class AudioManager : MonoBehaviour {
         //int fff = 0;
         float hzPerBin = (SampleRate / 2f) / sampleCount;
         //Debug.Log($"Hz per Bin: {hzPerBin}");
-        for (int i = 0; i < FrequencyBands.Length; i++)
+        for (int i = 0; i < _frequencyBands.Length; i++)
         {
             /*
             int start = (int)Mathf.Pow(2, i) - 1; //-1 because 2^0 == 1 so Index 0 is not captured
@@ -149,18 +191,15 @@ public sealed class AudioManager : MonoBehaviour {
             int e = s + s + 1;
             float avg = 0f;
             for (int k = s; k < e; k++)
-                avg += FFTSpectrumDataLeft[s] * (k + 1);
+                avg += FFTSpectrumDataChannel0[s] * (k + 1);
             avg /= s + 1;
 
             FrequencyBand band = _frequencyBands[i];
             band.frequencyRange = new Range(s * hzPerBin, e * hzPerBin);
             band.frequency = avg * sampleScalar;
-            band.smoothedFrequency = Mathf.MoveTowards(band.smoothedFrequency, band.frequency, frequencySmoothing * Time.deltaTime);
+                
 
-            if (band.frequency > band.maxFrequency)
-                band.maxFrequency = band.frequency;
-            band.mappedFrequency = band.frequency / band.maxFrequency;
-            band.smoothedMappedFrequency = band.smoothedFrequency / band.maxFrequency;
+            //band.smoothedFrequency = Mathf.MoveTowards(band.smoothedFrequency, band.frequency, frequencySmoothing * Time.deltaTime);
             _frequencyBands[i] = band;
         }
     }
@@ -176,7 +215,7 @@ public sealed class AudioManager : MonoBehaviour {
         float average = 0f;
         float scalar = useScalar ? sampleScalar : 1f;
         for (int i = startIndex; i <= endIndex; i++)
-            average += FFTSpectrumDataLeft[i] * scalar;
+            average += FFTSpectrumDataChannel0[i] * scalar;
         return average / (endIndex - startIndex + 1);
     }
 
@@ -185,10 +224,10 @@ public sealed class AudioManager : MonoBehaviour {
         volumeIndependentMixerGroup.audioMixer.SetFloat(kVisualizationVolume, Mathf.Log(volume) * 20f);
     }
 
-    #region Beat Detection
+    #region CConstant Beat Detection
     private float[] _historyBuffer;
 
-    private void OnEnableBeatDetection()
+    private void OnEnableCConstantBeatDetection()
     {
         _historyBuffer = new float[Mathf.FloorToInt(SampleRate / sampleCount)];
         onBeatDetected = new BeatEvent();
@@ -198,7 +237,7 @@ public sealed class AudioManager : MonoBehaviour {
         float e = 0;
 
         for (int i = 0; i < sampleCount; i++)
-            e += Mathf.Pow(FFTSpectrumDataLeft[i], 2f) + Mathf.Pow(FFTSpectrumDataRight[i], 2f);
+            e += Mathf.Pow(FFTSpectrumDataChannel0[i], 2f) + Mathf.Pow(FFTSpectrumDataChannel1[i], 2f);
         return e;
     }
 
@@ -218,7 +257,7 @@ public sealed class AudioManager : MonoBehaviour {
         return variance / _historyBuffer.Length;
     }
 
-    private void UpdateBeatDetection() {
+    private void UpdateCConstantBeatDetection() {
         float i = CalculateInstantEnergy();
         float a = CalculateAverageLocalEnergy();
         float v = CalculateEnergyVariance(a);
@@ -240,6 +279,89 @@ public sealed class AudioManager : MonoBehaviour {
     public class BeatEvent : UnityEvent<float, float, float> {
         //Stub
     }
+    #endregion
+
+    #region Spectral Flux Beat Detection
+    private float[] _latestSpectrum;
+    private float[] _lastFrameSpectrum;
+    private List<SpectralFluxData> _samples;
+    private int _fluxIndex;
+
+    [Header("Spectral Flux Beat Detection")]
+    public int previousSampleCount;
+    public float beatDetectionThresholdMultiplier;
+
+    private void OnEnableSpectralFluxBeatDetection() {
+        _latestSpectrum = new float[FFTSpectrumDataChannel0.Length];
+        _lastFrameSpectrum = new float[_latestSpectrum.Length];
+        _samples = new List<SpectralFluxData>();
+        _fluxIndex = previousSampleCount / 2;
+    }
+
+    private void UpdateSpectralFluxBeatDetection() {
+        _latestSpectrum.CopyTo(_lastFrameSpectrum, 0);
+        FFTSpectrumDataChannel0.CopyTo(_latestSpectrum, 0);
+        SpectralFluxData data = new SpectralFluxData();
+
+        data.value = CalculateRectifiedSpectralFlux();
+        _samples.Add(data);
+
+        if (_samples.Count >= previousSampleCount)
+        {
+            data.threshold = CalculateSpectralFluxThresholdAtIndex(_fluxIndex);
+            data.offset = GetThresholdOffsetFluxData(_samples[_fluxIndex].value, data.threshold);
+            _samples[_fluxIndex] = data;
+            int beatIndex = _fluxIndex - 1;
+
+            float spectralFluxValue = _samples[beatIndex].offset;
+            if (IsBeat(_samples[beatIndex].offset, _samples[beatIndex + 1].offset, _samples[beatIndex - 1].offset))
+                onBeatDetected?.Invoke(spectralFluxValue, spectralFluxValue, spectralFluxValue);
+
+            _fluxIndex++;
+        }
+    }
+
+    private bool IsBeat(float thresholdOffsetFlux, float nextThresholdOffsetFlux, float lastThresholdOffsetFlux) {
+        return thresholdOffsetFlux > nextThresholdOffsetFlux && thresholdOffsetFlux > lastThresholdOffsetFlux;
+    }
+
+    private float GetThresholdOffsetFluxData(float spectralFlux, float fluxThreshold) {
+        float offset = spectralFlux - fluxThreshold;
+        if (offset > 0f)
+            return offset;
+        return 0f;
+    }
+
+    private float CalculateRectifiedSpectralFlux() {
+        float e = 0;
+        for (int i = 0; i < _latestSpectrum.Length; i++) {
+            float s = _latestSpectrum[i] - _lastFrameSpectrum[i];
+            if (s > 0f)
+                e += s;
+        }
+        return e;
+    }
+
+    private float CalculateSpectralFluxThresholdAtIndex(int index) {
+        int halfPreviousSamples = previousSampleCount / 2;
+        int start = Mathf.Max(0, index - halfPreviousSamples);
+        int end = Mathf.Min(_samples.Count - 1, index + halfPreviousSamples);
+
+        float s = 0;
+        for (int i = start; i < end; i++)
+            s += _samples[i].value;
+        int sampleCount = end - start;
+
+        return (s / sampleCount) * beatDetectionThresholdMultiplier;
+    }
+
+    public struct SpectralFluxData
+    {
+        public float value;
+        public float threshold;
+        public float offset;
+    } 
+
     #endregion
 }
 
@@ -294,6 +416,7 @@ public struct FrequencyBand {
     public float mappedFrequency;
     public float smoothedFrequency;
     public float smoothedMappedFrequency;
+    public float smoothing;
     public Range frequencyRange;
 }
 
@@ -327,4 +450,9 @@ public struct Range {
             return $"Low: {low} | High: {high}";
         }
     }
+}
+
+public enum BeatDetectionAlgorithm {
+    SpectralFlux,
+    CConstant
 }

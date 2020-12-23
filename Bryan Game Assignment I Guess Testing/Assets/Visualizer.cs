@@ -23,7 +23,7 @@ public class Visualizer : AudioBehaviour
     {
         if (!ManagerInstance || FrequencyBands == null) return;
         for (int s = 0; s < FrequencyBands.Length; s++) {
-            float freq = FrequencyBands[s].smoothedFrequency;
+            float freq = FrequencyBands[s].smoothedMappedFrequency;
             Gizmos.color = Color.HSVToRGB(1f / FrequencyBands.Length * s, 1f, 1f);
             float yScale = freq;
             Vector3 pos = transform.position + new Vector3(s * scale + spacing, yScale / 2f, 0f);
