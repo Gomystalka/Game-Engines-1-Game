@@ -101,10 +101,10 @@ public class CustomTerrain : MonoBehaviour
                 int index = (int)((x * oneW) + (width + 1) * (y * oneH));
                 Chunk chunk = new Chunk()
                 {
-                    bottomLeft = index,
-                    bottomRight = (int)((x * oneW) + (width + 1) * ((y + 1) * oneH)),
-                    topLeft = (int)(((x + 1) * oneW) + (width + 1) * (y * oneH)),
-                    topRight = (int)(((x + 1) * oneW) + (width + 1) * ((y + 1) * oneH))
+                    bottomLeftIndex = index,
+                    bottomRightIndex = (int)((x * oneW) + (width + 1) * ((y + 1) * oneH)),
+                    topLeftIndex = (int)(((x + 1) * oneW) + (width + 1) * (y * oneH)),
+                    topRightIndex = (int)(((x + 1) * oneW) + (width + 1) * ((y + 1) * oneH))
                 };
                 chunk.bottomLeftPoint = new Vector2(x * oneW, y * oneH).ToIntegerVector();
                 chunk.topRightPoint = new Vector2((x + 1) * oneW, (y + 1) * oneH).ToIntegerVector();
@@ -167,7 +167,7 @@ public class CustomTerrain : MonoBehaviour
                 Gizmos.color = Color.magenta;
             }
             //Gizmos.DrawSphere(LocalVertexToWorldSpace(chunks[1].Center.x, chunks[1].Center.y), chunkCornerSize);
-            Gizmos.DrawSphere(LocalVertexToWorldSpace(PopulateChunk(4, v.x, v.y, 100f)), chunkCornerSize);
+            //Gizmos.DrawSphere(LocalVertexToWorldSpace(PopulateChunk(0, v.x, v.y, 100f)), chunkCornerSize);
         }
     }
 
@@ -202,10 +202,10 @@ public class CustomTerrain : MonoBehaviour
 
 [System.Serializable]
 public class Chunk {
-    public int bottomLeft;
-    public int bottomRight;
-    public int topLeft;
-    public int topRight;
+    public int bottomLeftIndex;
+    public int bottomRightIndex;
+    public int topLeftIndex;
+    public int topRightIndex;
     public Vector2Int bottomLeftPoint;
     public Vector2Int bottomRightPoint;
     public Vector2Int topLeftPoint;

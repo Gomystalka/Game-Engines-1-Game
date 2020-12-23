@@ -20,6 +20,7 @@ public class VisualizedCustomTerrain : AudioBehaviour
         base.OnEnable();
         _terrain = GetComponent<CustomTerrain>();
         _canRespawn = true;
+        GenerateVisualizedHeight();
     }
 
     public override void Update()
@@ -29,22 +30,28 @@ public class VisualizedCustomTerrain : AudioBehaviour
 
         Vector3 destination = transform.position + respawnOffset + (transform.TransformDirection(respawnOffsetDirection) * (_terrain.width * _terrain.spacing.x));
         float dist = Vector3.Distance(new Vector3(player.position.x, destination.y, player.position.z), new Vector3(player.position.x, destination.y, destination.z));
-        //if (dist <= 1f && _canRespawn)
-            //OnRespawnThresholdReached();
+        float dot = Vector3.Dot((destination - new Vector3(player.position.x, transform.position.y, player.position.z)).normalized, player.transform.forward);
+        
+        if (dist * (dot < 0 ? -1f : 1f) <= 0f && _canRespawn)
+            OnRespawnThresholdReached();
         //_yIndex = _yIndex + 1 < length ? _yIndex + 1 : 0;
 
     }
 
     private void OnRespawnThresholdReached()
     {
+        if (_terrain)
+            _terrain.transform.position = new Vector3(transform.position.x, transform.position.y, player.position.z);
+        GenerateVisualizedHeight();
         _canRespawn = false;
-        //Invoke("ResetThresholdCheck", respawnThresholdCheckResetTime);
+        Invoke("ResetThresholdCheck", respawnThresholdCheckResetTime);
     }
 
     private void ResetThresholdCheck() => _canRespawn = true;
 
     private void GenerateVisualizedHeight()
     {
+        /*
         int bandFactor = Mathf.FloorToInt(_terrain.width / FrequencyBands.Length);
         int currentVertex = 0;
         for (int y = 0; y < _terrain.height; y++)
@@ -54,6 +61,19 @@ public class VisualizedCustomTerrain : AudioBehaviour
                 _terrain.SetVertexHeight(currentVertex, Random.Range(0f, 30f));
                 currentVertex++;
                 //_heights[i, y] = FrequencyBands[Mathf.FloorToInt(i / bandFactor)].smoothedFrequency;
+            }
+        }
+        */
+        Chunk baseChunk = _terrain.chunks[0];
+        Chunk chunk = _terrain.chunks[4];
+        for (int y = 0; y < baseChunk.height; y++)
+        {
+            for (int x = 0; x < baseChunk.width; x++)
+            {
+                Vector2Int vertex = chunk.MapToChunkBounds(x, y);
+                Vector3 vert = _terrain.Vertices[_terrain.ToSingleIndex(vertex.x, vertex.y)];
+                vert.y = Random.Range(0f, 20f);
+                _terrain.Vertices[_terrain.ToSingleIndex(vertex.x, vertex.y)] = vert;
             }
         }
         _terrain.ApplyVertexChanges();
@@ -71,8 +91,6 @@ public class VisualizedCustomTerrain : AudioBehaviour
         Gizmos.color = Color.magenta;
         if (player)
             Gizmos.DrawLine(new Vector3(player.position.x, destination.y, player.position.z), new Vector3(player.position.x, destination.y, destination.z));
-        
-
 
         /*
         float one = w / chunkCount;
