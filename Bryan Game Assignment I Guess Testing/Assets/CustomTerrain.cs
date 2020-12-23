@@ -51,6 +51,7 @@ public class CustomTerrain : MonoBehaviour
         if (!enableMirror) return;
         _mirrorObject.transform.position = transform.position + mirrorPositionOffset;
         _mirrorObject.transform.localScale = mirrorScale;
+        _mirrorRenderer.sharedMaterials = Renderer.sharedMaterials;
     }
 
     private Mesh GeneratePlaneMesh() {

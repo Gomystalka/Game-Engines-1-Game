@@ -59,8 +59,13 @@ public class Player : MonoBehaviour
         FireTargettingRay();
         UpdateCrosshair();
 
-        if (_cannonController && Input.GetButton("Fire1"))
-            _cannonController.FireProjectile();
+        if (_cannonController)
+        {
+            if (Input.GetButton("Fire1"))
+                _cannonController.FireProjectile();
+            if (Input.GetButton("Fire2") && _currentTarget)
+                _cannonController.FireRocket(_currentTarget.transform);
+        }
     }
 
     private void ApplyRoll() {
@@ -102,11 +107,12 @@ public class Player : MonoBehaviour
     public float lockedOnSizePx = 150f;
 
     private void FireTargettingRay() {
-        if (_currentTarget && !_camera.CanSee(_currentTarget.Bounds))
+        if (_currentTarget && !_camera.CanSee(_currentTarget.Bounds) || !_cannonController.RocketActive)
         {
             OnTargetLost();
             _currentTarget = null;
         }
+        if (!_cannonController.RocketActive) return;
 
         if (_currentTarget) return;
 
