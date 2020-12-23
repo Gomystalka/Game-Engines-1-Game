@@ -57,12 +57,15 @@ public class CustomTerrain : MonoBehaviour
         Mesh m = new Mesh();
         Vertices = new Vector3[(width + 1) * (height + 1)];
         _tris = new int[width * height * 6];
+        Vector2[] uv = new Vector2[Vertices.Length];
         int vertIndex = 0;
         for (int y = 0; y <= height; y++)
         {
             for (int x = 0; x <= width; x++)
             {
-                Vertices[vertIndex] = new Vector3(x * spacing.x, 0f, y * spacing.z);
+                Vector3 vertex = new Vector3(x * spacing.x, 0f, y * spacing.z);
+                Vertices[vertIndex] = vertex;
+                uv[vertIndex] = new Vector2(vertex.x, vertex.z);
                 vertIndex++;
             }
         }
@@ -87,9 +90,10 @@ public class CustomTerrain : MonoBehaviour
         m.Clear();
         m.vertices = Vertices;
         m.triangles = _tris;
-        m.RecalculateTangents();
+        m.uv = uv;
         m.RecalculateNormals();
         m.RecalculateBounds();
+        m.RecalculateTangents();
         return m;
     }
 
@@ -102,9 +106,9 @@ public class CustomTerrain : MonoBehaviour
         Mesh m = _filter.sharedMesh;
         m.vertices = Vertices;
         //m.triangles = _tris;
-        m.RecalculateTangents();
         m.RecalculateNormals();
         m.RecalculateBounds();
+        m.RecalculateTangents();
 
         if (enableMirror)
             _mirrorFilter.sharedMesh = m;

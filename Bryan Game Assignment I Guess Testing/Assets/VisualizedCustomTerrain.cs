@@ -11,6 +11,8 @@ public class VisualizedCustomTerrain : AudioBehaviour
     public Vector3 respawnOffsetDirection;
     public Transform player;
     public float respawnThresholdCheckResetTime = 2f;
+    public float heightScalar;
+    public Vector2 perlinNoiseZoom;
 
     private CustomTerrain _terrain;
     private bool _canRespawn = true;
@@ -74,6 +76,8 @@ public class VisualizedCustomTerrain : AudioBehaviour
         for (int u = 0; u < 3; u++)
             _terrain.ReplaceChunk(_terrain.chunks[u], _terrain.chunks[u + 6]);
 
+        int bandFactor = Mathf.FloorToInt(_terrain.width / FrequencyBands.Length);
+        Debug.Log(FrequencyBands[0].frequency);
         for (int c = startIndex; c < _terrain.chunks.Length; c++)
         {
             Chunk chunk = _terrain.chunks[c];
@@ -83,7 +87,7 @@ public class VisualizedCustomTerrain : AudioBehaviour
                 {
                     Vector2Int vertex = chunk.MapToChunkBounds(x, y);
                     Vector3 vert = _terrain.Vertices[_terrain.ToSingleIndex(vertex.x, vertex.y)];
-                    vert.y = Random.Range(0f, 20f);
+                    vert.y = Mathf.PerlinNoise(x * perlinNoiseZoom.x, y * perlinNoiseZoom.y) * heightScalar;
                     _terrain.Vertices[_terrain.ToSingleIndex(vertex.x, vertex.y)] = vert;
                 }
             }
