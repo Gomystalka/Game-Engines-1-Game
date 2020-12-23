@@ -198,6 +198,25 @@ public class CustomTerrain : MonoBehaviour
     {
         return LocalVertexToWorldSpace(point.x, point.y);
     }
+
+    //0 - 6
+    public void ReplaceChunk(Chunk toBeReplaced, Chunk toReplace)
+    {
+        for (int y = 0; y < toReplace.height; y++)
+        {
+            for (int x = 0; x < toReplace.width; x++)
+            {
+                Vector2Int point = toReplace.MapToChunkBounds(x, y);
+                Vector3 v = Vertices[ToSingleIndex(point.x, point.y)];
+                Vector2Int mappedPoint = toBeReplaced.MapToChunkBounds(x, y);
+                int replaceeIndex = ToSingleIndex(mappedPoint.x, mappedPoint.y);
+                Vector3 replacedVertex = Vertices[replaceeIndex];
+                replacedVertex.y = v.y;
+                Vertices[replaceeIndex] = replacedVertex;
+            }
+        }
+    }
+
 }
 
 [System.Serializable]

@@ -20,7 +20,7 @@ public class VisualizedCustomTerrain : AudioBehaviour
         base.OnEnable();
         _terrain = GetComponent<CustomTerrain>();
         _canRespawn = true;
-        GenerateVisualizedHeight();
+        GenerateVisualizedHeight(true);
     }
 
     public override void Update()
@@ -40,16 +40,20 @@ public class VisualizedCustomTerrain : AudioBehaviour
 
     private void OnRespawnThresholdReached()
     {
+        //6 7 8 = 0 1 2
+
+        
         if (_terrain)
             _terrain.transform.position = new Vector3(transform.position.x, transform.position.y, player.position.z);
-        GenerateVisualizedHeight();
+        GenerateVisualizedHeight(false);
         _canRespawn = false;
         Invoke("ResetThresholdCheck", respawnThresholdCheckResetTime);
+        
     }
 
     private void ResetThresholdCheck() => _canRespawn = true;
 
-    private void GenerateVisualizedHeight()
+    private void GenerateVisualizedHeight(bool firstRun)
     {
         /*
         int bandFactor = Mathf.FloorToInt(_terrain.width / FrequencyBands.Length);
@@ -65,15 +69,23 @@ public class VisualizedCustomTerrain : AudioBehaviour
         }
         */
         Chunk baseChunk = _terrain.chunks[0];
-        Chunk chunk = _terrain.chunks[4];
-        for (int y = 0; y < baseChunk.height; y++)
+        int startIndex = firstRun ? 0 : 3;
+
+        for (int u = 0; u < 3; u++)
+            _terrain.ReplaceChunk(_terrain.chunks[u], _terrain.chunks[u + 6]);
+
+        for (int c = startIndex; c < _terrain.chunks.Length; c++)
         {
-            for (int x = 0; x < baseChunk.width; x++)
+            Chunk chunk = _terrain.chunks[c];
+            for (int y = 0; y < baseChunk.height; y++)
             {
-                Vector2Int vertex = chunk.MapToChunkBounds(x, y);
-                Vector3 vert = _terrain.Vertices[_terrain.ToSingleIndex(vertex.x, vertex.y)];
-                vert.y = Random.Range(0f, 20f);
-                _terrain.Vertices[_terrain.ToSingleIndex(vertex.x, vertex.y)] = vert;
+                for (int x = 0; x < baseChunk.width; x++)
+                {
+                    Vector2Int vertex = chunk.MapToChunkBounds(x, y);
+                    Vector3 vert = _terrain.Vertices[_terrain.ToSingleIndex(vertex.x, vertex.y)];
+                    vert.y = Random.Range(0f, 20f);
+                    _terrain.Vertices[_terrain.ToSingleIndex(vertex.x, vertex.y)] = vert;
+                }
             }
         }
         _terrain.ApplyVertexChanges();
@@ -109,3 +121,13 @@ public class VisualizedCustomTerrain : AudioBehaviour
 
     }
 }
+
+#if UNITY_EDITOR
+[UnityEditor.CustomEditor(typeof(VisualizedCustomTerrain))]
+public class VisualizedCustomTerrainEditor : UnityEditor.Editor {
+    public override void OnInspectorGUI()
+    {
+        base.OnInspectorGUI();
+    }
+}
+#endif
