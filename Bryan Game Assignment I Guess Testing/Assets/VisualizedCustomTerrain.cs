@@ -46,6 +46,18 @@ public class VisualizedCustomTerrain : AudioBehaviour
         _canRespawn = true;
         GenerateVisualizedHeight(true);
         OnBeatDetected.AddListener(OnBeat);
+
+        if (videoPlayer)
+        {
+            videoPlayer.url = Menu.selectedVideoClipPath;
+            videoPlayer.isLooping = Menu.loopVideo;
+            videoPlayer.audioOutputMode = Menu.useVideoAudio ? VideoAudioOutputMode.AudioSource : VideoAudioOutputMode.None;
+            if (!string.IsNullOrEmpty(videoPlayer.url) && videoPlayer.url != "None")
+            {
+                videoPlayer.Stop();
+                videoPlayer.Play();
+            }
+        }
     }
 
     private void OnBeat(float instantEnergy, float averageLocalEnergy, float cxa) {
