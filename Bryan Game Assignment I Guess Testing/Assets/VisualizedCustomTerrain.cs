@@ -69,6 +69,7 @@ public class VisualizedCustomTerrain : AudioBehaviour
     }
 
     private void SpawnEnemy() {
+        if (!player) return;
         float midY = transform.position.y + _terrain.mirrorPositionOffset.y / 2f;
         Vector3 spawnLocation = new Vector3(player.position.x + Random.Range(spawnAreaRangeX.low, spawnAreaRangeX.high), midY + Random.Range(spawnAreaRangeY.low, spawnAreaRangeY.high), player.position.z);
         spawnLocation.z = player.position.z + player.GetComponentInChildren<Player>().Camera.farClipPlane;
@@ -83,7 +84,7 @@ public class VisualizedCustomTerrain : AudioBehaviour
     {
         base.Update();
         if (!Source.isPlaying) return;
-
+        if (!player) return;
         Vector3 destination = transform.position + respawnOffset + (transform.TransformDirection(respawnOffsetDirection) * (_terrain.width * _terrain.spacing.x));
         float dist = Vector3.Distance(new Vector3(player.position.x, destination.y, player.position.z), new Vector3(player.position.x, destination.y, destination.z));
         float dot = Vector3.Dot((destination - new Vector3(player.position.x, transform.position.y, player.position.z)).normalized, player.transform.forward);

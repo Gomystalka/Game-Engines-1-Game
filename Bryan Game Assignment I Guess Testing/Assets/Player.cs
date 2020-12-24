@@ -167,6 +167,20 @@ public class Player : MonoBehaviour
         UnityEditor.Handles.Label(transform.position + Vector3.up * 1.4f, $"MAG: {(Vector3)_axes * _currentForwardSpeed * Time.deltaTime}");
 #endif
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Terrain") || other.CompareTag("Enemy")) {
+            Die();
+        }
+    }
+
+    private void Die() {
+        Camera.transform.SetParent(null, true);
+        AudioManager.Instance.SpawnParticle(0, transform.position);
+        AudioManager.PlayerDead = true;
+        Destroy(transform.root.gameObject);
+    }
 }
 
 [System.Flags]

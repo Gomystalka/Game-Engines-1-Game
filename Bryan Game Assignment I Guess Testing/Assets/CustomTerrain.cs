@@ -16,6 +16,7 @@ public class CustomTerrain : MonoBehaviour
 
     private MeshFilter _filter;
     public MeshRenderer Renderer { get; private set; }
+    public MeshCollider Collider { get; private set; }
     public Vector3[] Vertices { get; private set; }
     private int[] _tris;
 
@@ -41,6 +42,7 @@ public class CustomTerrain : MonoBehaviour
     {
         _filter = GetComponent<MeshFilter>();
         Renderer = GetComponent<MeshRenderer>();
+        Collider = GetComponent<MeshCollider>();
         _filter.mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
         _filter.mesh = GeneratePlaneMesh();
         RecalculateChunks();
@@ -111,9 +113,14 @@ public class CustomTerrain : MonoBehaviour
         m.RecalculateNormals();
         m.RecalculateBounds();
         m.RecalculateTangents();
+        if (Collider)
+            Collider.sharedMesh = m;
 
         if (enableMirror)
+        {
             _mirrorFilter.sharedMesh = m;
+            _mirrorCollider.sharedMesh = m;
+        }
     }
 
     public void RecalculateChunks() {
@@ -261,6 +268,7 @@ public class CustomTerrain : MonoBehaviour
         _mirrorFilter.sharedMesh = _filter.sharedMesh;
         _mirrorRenderer.sharedMaterials = Renderer.sharedMaterials;
         _mirrorCollider.sharedMesh = _mirrorFilter.sharedMesh;
+        _mirrorObject.tag = gameObject.tag;
     }
 
 }

@@ -26,6 +26,7 @@ public class Rocket : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag != "Player") {
+            AudioManager.Instance.SpawnParticle(0, transform.position);
             Destroy(gameObject);
         }
     }

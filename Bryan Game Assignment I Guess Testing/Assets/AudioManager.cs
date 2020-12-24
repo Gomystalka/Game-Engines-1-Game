@@ -38,6 +38,7 @@ public sealed class AudioManager : MonoBehaviour {
     public BeatEvent onBeatDetected;
 
     public static AudioManager Instance;
+    public static bool PlayerDead { get; set; }
 
     [Header("Beat Detection")]
     public float beatStrengthThresholdMultiplier = 1.5f;
@@ -124,6 +125,9 @@ public sealed class AudioManager : MonoBehaviour {
             UpdateCConstantBeatDetection();
         else
             UpdateSpectralFluxBeatDetection();
+
+        if (PlayerDead)
+            source.pitch = Mathf.Lerp(source.pitch, 0f, 10f * Time.deltaTime);
     }
 
     public void ResetSpectrum()
