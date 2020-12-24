@@ -57,10 +57,13 @@ public class Teki : AudioBehaviour
                 EndDataCapture();
         }, VisualizationSettings.kEnemyDataCaptureIntervalSeconds / _mesh.vertexCount, true);
         */
+        /*
         EndDataCapture();
         StartCoroutine(CaptureData(VisualizationSettings.kEnemyDataCaptureIntervalSeconds / (float)_mesh.vertexCount));
+    */
     }
 
+    /*
     public override void Update()
     {
         base.Update();
@@ -100,12 +103,13 @@ public class Teki : AudioBehaviour
         Debug.Log($"Captured {_vertexInfo.Length} samples.");
         ManipulateVertices();
     }
+    */
 
     private void ManipulateVertices() {
         Mesh m = _meshFilter.mesh; //Get mesh instance
         Vector3[] _vertices = _baseVertices;
         for (int i = 0; i < _vertexInfo.Length; i++)
-                _vertices[i] += _vertexInfo[i] * SampleScalar * _mesh.normals[i];
+                //_vertices[i] += _vertexInfo[i] * SampleScalar * _mesh.normals[i];
         m.vertices = _vertices;
         m.RecalculateNormals();
         m.RecalculateBounds();
