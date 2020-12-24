@@ -25,7 +25,16 @@ public class VisualizedCustomTerrain : AudioBehaviour
     public float scaledBeatStrengthThreshold;
     public float wireColorIntensity;
 
+    [Header("Enemy Spawns")]
+    public Range spawnAreaRange;
+    public float maxSize;
+    public float minTimeBetweenSpawns = 0.5f;
+
+    public static float Hue { get; private set; }
+    public static float InverseHue { get; private set; }
+
     public VideoPlayer videoPlayer;
+    private float _spawnTimer;
 
     public override void OnEnable()
     {
@@ -46,6 +55,18 @@ public class VisualizedCustomTerrain : AudioBehaviour
             mat.SetFloat("_WireThickness", mat.GetFloat("_MaxThickness") * wireScalar);
         }
         */
+
+        float scaledCxa = cxa * 1000f;
+        if (Time.time >= _spawnTimer)
+        {
+            _spawnTimer = Time.time + minTimeBetweenSpawns;
+            if (scaledCxa >= scaledBeatStrengthThreshold || scaledBeatStrengthThreshold == -1f)
+                SpawnEnemy();
+        }
+    }
+
+    private void SpawnEnemy() {
+
     }
 
     public override void Update()
@@ -70,9 +91,10 @@ public class VisualizedCustomTerrain : AudioBehaviour
                 a += b.frequency;
             }
             float thickness = Mathf.Clamp(a / 3 * wireScalar, 0f, mat.GetFloat("_MaxThickness") - 200f);
-            float h = Utilities.MapRange(thickness, 0f, mat.GetFloat("_MaxThickness") - 200f, 0f, 1f);
+            Hue = Utilities.MapRange(thickness, 0f, mat.GetFloat("_MaxThickness") - 200f, 0f, 1f);
+            InverseHue = 1 - Hue;
             mat.SetFloat("_WireThickness", Mathf.Lerp(mat.GetFloat("_WireThickness"), thickness, Time.deltaTime * wireThicknessRate));
-            mat.SetColor("_WireColor", Color.Lerp(mat.GetColor("_WireColor"), Color.HSVToRGB(1f - h, 1f, 1f, true) * wireColorIntensity, Time.deltaTime * wireThicknessRate));
+            mat.SetColor("_WireColor", Color.Lerp(mat.GetColor("_WireColor"), Color.HSVToRGB(Hue, 1f, 1f, true) * wireColorIntensity, Time.deltaTime * wireThicknessRate));
 
             float len = 0f;
             float time = 0f;
@@ -92,6 +114,9 @@ public class VisualizedCustomTerrain : AudioBehaviour
             float mappedSongLength = Utilities.MapRange(time, 0f, len, _terrain.maxMirrorHeight, heightScalar * 2f);
             _terrain.mirrorPositionOffset = new Vector3(_terrain.mirrorPositionOffset.x, mappedSongLength, _terrain.mirrorPositionOffset.z);
         }
+
+        float midY = transform.position.y + _terrain.mirrorPositionOffset.y / 2f;
+
     }
 
     private void OnRespawnThresholdReached()
@@ -176,7 +201,9 @@ public class VisualizedCustomTerrain : AudioBehaviour
         }
         Gizmos.color = Color.green;
         */
-
+        Gizmos.color = Color.blue;
+        Vector3 mid = new Vector3(transform.position.x, transform.position.y + _terrain.mirrorPositionOffset.y / 2f, transform.position.z);
+        Gizmos.DrawSphere(mid, 2f);
     }
 }
 

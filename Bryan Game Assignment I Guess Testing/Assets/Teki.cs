@@ -27,6 +27,8 @@ public class Teki : AudioBehaviour
     [Header("Visualization")]
     public float independentSampleScalar = 100f;
 
+    private float _spinSpeed;
+
     public override void OnEnable()
     {
         base.OnEnable();
@@ -63,6 +65,7 @@ public class Teki : AudioBehaviour
         EndDataCapture();
         StartCoroutine(CaptureData(VisualizationSettings.kEnemyDataCaptureIntervalSeconds / (float)_mesh.vertexCount));
     */
+        _spinSpeed = Random.Range(5f, 30f);
         ManipulateVertices();
     }
 
@@ -110,6 +113,14 @@ public class Teki : AudioBehaviour
     public override void Update()
     {
         base.Update();
+        if (_renderer)
+        {
+            Material mat = _renderer.material;
+            mat.color = Color.Lerp(mat.color, Color.HSVToRGB(VisualizedCustomTerrain.InverseHue, 1f, 1f, true) * 1.2f, Time.deltaTime * 4f);
+            mat.SetColor("_EmissionColor", mat.color);
+        }
+
+        transform.Rotate(transform.TransformDirection(RandomizeDirection()), _spinSpeed * Time.deltaTime);
     }
 
     private void ManipulateVertices() {
@@ -118,7 +129,7 @@ public class Teki : AudioBehaviour
         int spectrumFactor = Mathf.FloorToInt(_baseVertices.Length / FrequencyBands.Length - 1);
         Debug.Log(FrequencyBands.Length);
         for (int i = 0; i < _baseVertices.Length; i++)
-            _vertices[i] += m.normals[i] * FrequencyBands[Mathf.Clamp(Mathf.FloorToInt(i / spectrumFactor), 0, FrequencyBands.Length - 1)].frequency;
+            _vertices[i] += m.normals[i] * FrequencyBands[Mathf.Clamp(Mathf.FloorToInt(i / spectrumFactor), 0, FrequencyBands.Length - 1)].frequency * 0.5f;
                 //_vertices[i] += _vertexInfo[i] * SampleScalar * _mesh.normals[i];
         m.vertices = _vertices;
         m.RecalculateNormals();
