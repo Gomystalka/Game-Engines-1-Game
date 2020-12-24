@@ -6,6 +6,7 @@ using UnityEngine;
 public class Teki : AudioBehaviour
 {
     private MeshFilter _meshFilter;
+    private MeshCollider _collider;
     private MeshRenderer _renderer;
     private Mesh _mesh;
     private Vector3[] _baseVertices;
@@ -28,12 +29,14 @@ public class Teki : AudioBehaviour
     public float independentSampleScalar = 100f;
 
     private float _spinSpeed;
+    private Vector3 _direction;
 
     public override void OnEnable()
     {
         base.OnEnable();
         _meshFilter = GetComponent<MeshFilter>();
         _renderer = GetComponent<MeshRenderer>();
+        _collider = GetComponent<MeshCollider>();
         if (_meshFilter)
             _mesh = _meshFilter.sharedMesh;
         if (_mesh)
@@ -66,7 +69,8 @@ public class Teki : AudioBehaviour
         StartCoroutine(CaptureData(VisualizationSettings.kEnemyDataCaptureIntervalSeconds / (float)_mesh.vertexCount));
     */
         _spinSpeed = Random.Range(5f, 30f);
-        ManipulateVertices();
+        _direction = RandomizeDirection();
+        //ManipulateVertices();
     }
 
     /*
@@ -116,24 +120,32 @@ public class Teki : AudioBehaviour
         if (_renderer)
         {
             Material mat = _renderer.material;
-            mat.color = Color.Lerp(mat.color, Color.HSVToRGB(VisualizedCustomTerrain.InverseHue, 1f, 1f, true) * 1.2f, Time.deltaTime * 4f);
+            mat.color = Color.Lerp(mat.color, Color.HSVToRGB(VisualizedCustomTerrain.InverseHue, 1f, 1f, true) * 1.05f, Time.deltaTime * 4f);
             mat.SetColor("_EmissionColor", mat.color);
         }
 
-        transform.Rotate(transform.TransformDirection(RandomizeDirection()), _spinSpeed * Time.deltaTime);
+        transform.Rotate(transform.TransformDirection(_direction), _spinSpeed * Time.deltaTime);
     }
 
-    private void ManipulateVertices() {
+    public void ManipulateVertices(float maxHeight) {
         Mesh m = _meshFilter.mesh; //Get mesh instance
         Vector3[] _vertices = _baseVertices;
         int spectrumFactor = Mathf.FloorToInt(_baseVertices.Length / FrequencyBands.Length - 1);
         Debug.Log(FrequencyBands.Length);
         for (int i = 0; i < _baseVertices.Length; i++)
+        {
             _vertices[i] += m.normals[i] * FrequencyBands[Mathf.Clamp(Mathf.FloorToInt(i / spectrumFactor), 0, FrequencyBands.Length - 1)].frequency * 0.5f;
+            Vector3 v = _vertices[i];
+            v.x = Mathf.Clamp(v.x, -maxHeight, maxHeight);
+            v.y = Mathf.Clamp(v.y, -maxHeight, maxHeight);
+            v.z = Mathf.Clamp(v.z, -maxHeight, maxHeight);
+            _vertices[i] = v;
+        }
                 //_vertices[i] += _vertexInfo[i] * SampleScalar * _mesh.normals[i];
         m.vertices = _vertices;
         m.RecalculateNormals();
         m.RecalculateBounds();
+        _collider.sharedMesh = m;
         //m.RecalculateTangents();
     }
 

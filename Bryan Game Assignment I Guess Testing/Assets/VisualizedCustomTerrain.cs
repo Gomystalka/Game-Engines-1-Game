@@ -26,9 +26,12 @@ public class VisualizedCustomTerrain : AudioBehaviour
     public float wireColorIntensity;
 
     [Header("Enemy Spawns")]
-    public Range spawnAreaRange;
-    public float maxSize;
+    public Range spawnAreaRangeX;
+    public Range spawnAreaRangeY;
+    public float maxEnemySize;
     public float minTimeBetweenSpawns = 0.5f;
+    public float spawnDistance;
+    public GameObject enemyPrefab;
 
     public static float Hue { get; private set; }
     public static float InverseHue { get; private set; }
@@ -66,7 +69,14 @@ public class VisualizedCustomTerrain : AudioBehaviour
     }
 
     private void SpawnEnemy() {
-
+        float midY = transform.position.y + _terrain.mirrorPositionOffset.y / 2f;
+        Vector3 spawnLocation = new Vector3(player.position.x + Random.Range(spawnAreaRangeX.low, spawnAreaRangeX.high), midY + Random.Range(spawnAreaRangeY.low, spawnAreaRangeY.high), player.position.z);
+        spawnLocation.z = player.position.z + player.GetComponentInChildren<Player>().Camera.farClipPlane;
+        GameObject g = Instantiate(enemyPrefab, spawnLocation, Quaternion.identity);
+        Teki t = g.GetComponent<Teki>();
+        if (t)
+            t.ManipulateVertices(maxEnemySize);
+        Destroy(g, 20f);
     }
 
     public override void Update()
@@ -98,7 +108,7 @@ public class VisualizedCustomTerrain : AudioBehaviour
 
             float len = 0f;
             float time = 0f;
-            if (videoPlayer && videoPlayer.isPlaying)
+            if (videoPlayer && videoPlayer.isPlaying && videoPlayer.enabled)
             {
                 len = (float)videoPlayer.length;
                 time = (float)videoPlayer.time;
@@ -114,9 +124,6 @@ public class VisualizedCustomTerrain : AudioBehaviour
             float mappedSongLength = Utilities.MapRange(time, 0f, len, _terrain.maxMirrorHeight, heightScalar * 2f);
             _terrain.mirrorPositionOffset = new Vector3(_terrain.mirrorPositionOffset.x, mappedSongLength, _terrain.mirrorPositionOffset.z);
         }
-
-        float midY = transform.position.y + _terrain.mirrorPositionOffset.y / 2f;
-
     }
 
     private void OnRespawnThresholdReached()

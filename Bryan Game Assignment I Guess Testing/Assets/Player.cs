@@ -22,16 +22,16 @@ public class Player : MonoBehaviour
     private Transform _playerMesh;
     private float _currentForwardSpeed;
     private Vector2 _axes;
-    private Camera _camera;
+    public Camera Camera { get; private set; }
     private CannonController _cannonController;
 
     public bool IsCrosshairMoving { get { return _axes.magnitude >= axisDeadZone; } }
 
     private void OnEnable()
     {
-        _camera = transform.parent.GetComponentInChildren<Camera>();
-        if (!_camera)
-            _camera = Camera.main;
+        Camera = transform.parent.GetComponentInChildren<Camera>();
+        if (!Camera)
+            Camera = Camera.main;
         Utilities.inputInterpolationSpeed = crosshairSpeed;
         bounds.Constrain3DObject(transform);
         transform.localPosition = Vector3.zero;
@@ -107,7 +107,7 @@ public class Player : MonoBehaviour
     public float lockedOnSizePx = 150f;
 
     private void FireTargettingRay() {
-        if (_currentTarget && !_camera.CanSee(_currentTarget.Bounds) || !_cannonController.RocketActive)
+        if (_currentTarget && !Camera.CanSee(_currentTarget.Bounds) || !_cannonController.RocketActive)
         {
             OnTargetLost();
             _currentTarget = null;
@@ -134,7 +134,7 @@ public class Player : MonoBehaviour
                 OnTargetLockedOn();
             }
             else
-                targetCrosshair.localScale = Utilities.CalculateDepthIndependentSize(_camera, targetCrosshair, lockedOnSizePx);
+                targetCrosshair.localScale = Utilities.CalculateDepthIndependentSize(Camera, targetCrosshair, lockedOnSizePx);
         }
         else
         {
