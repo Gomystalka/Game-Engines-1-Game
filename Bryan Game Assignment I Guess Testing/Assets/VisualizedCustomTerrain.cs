@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Video;
 
 [RequireComponent(typeof(CustomTerrain))]
 [DefaultExecutionOrder(-10)]
@@ -23,6 +24,8 @@ public class VisualizedCustomTerrain : AudioBehaviour
     public int wireFrequencyBandIndex = 0;
     public float scaledBeatStrengthThreshold;
     public float wireColorIntensity;
+
+    public VideoPlayer videoPlayer;
 
     public override void OnEnable()
     {
@@ -70,6 +73,24 @@ public class VisualizedCustomTerrain : AudioBehaviour
             float h = Utilities.MapRange(thickness, 0f, mat.GetFloat("_MaxThickness") - 200f, 0f, 1f);
             mat.SetFloat("_WireThickness", Mathf.Lerp(mat.GetFloat("_WireThickness"), thickness, Time.deltaTime * wireThicknessRate));
             mat.SetColor("_WireColor", Color.Lerp(mat.GetColor("_WireColor"), Color.HSVToRGB(1f - h, 1f, 1f, true) * wireColorIntensity, Time.deltaTime * wireThicknessRate));
+
+            float len = 0f;
+            float time = 0f;
+            if (videoPlayer && videoPlayer.isPlaying)
+            {
+                len = (float)videoPlayer.length;
+                time = (float)videoPlayer.time;
+            }
+            else if (Clip && Source.isPlaying)
+            {
+                len = Clip.length;
+                time = Source.time;
+            }
+            else
+                return;
+
+            float mappedSongLength = Utilities.MapRange(time, 0f, len, _terrain.maxMirrorHeight, heightScalar * 2f);
+            _terrain.mirrorPositionOffset = new Vector3(_terrain.mirrorPositionOffset.x, mappedSongLength, _terrain.mirrorPositionOffset.z);
         }
     }
 

@@ -30,6 +30,7 @@ public class CustomTerrain : MonoBehaviour
     public bool enableMirror;
     public Vector3 mirrorScale;
     public Vector3 mirrorPositionOffset;
+    public float maxMirrorHeight = 200f;
 
     private GameObject _mirrorObject;
     private MeshRenderer _mirrorRenderer;
