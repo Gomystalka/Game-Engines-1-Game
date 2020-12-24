@@ -53,7 +53,9 @@ public class Menu : MonoBehaviour
     {
         RefreshFiles();
         volumeSlider.value = 1f;
-        OnVolumeSliderChanged(1f);
+        //OnVolumeSliderChanged(1f);
+        loopVideo = false;
+        useVideoAudio = false;
     }
 
     public void RefreshFiles() {

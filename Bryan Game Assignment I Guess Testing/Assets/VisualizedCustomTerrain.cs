@@ -51,6 +51,8 @@ public class VisualizedCustomTerrain : AudioBehaviour
             Source.clip = Menu.selectedClip;
             Source.Play();
         }
+        if (Source && Menu.useVideoAudio)
+            Source.clip = null;
 
         if (videoPlayer)
         {
