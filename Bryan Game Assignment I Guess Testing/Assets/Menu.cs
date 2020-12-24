@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.Video;
 using UnityEngine.UI;
+using UnityEngine.Audio;
 
 public class Menu : MonoBehaviour
 {
@@ -28,9 +29,24 @@ public class Menu : MonoBehaviour
 
     private string _previouslyLoadedVideo;
 
+    public AudioMixerGroup independentMixerGroup;
+    public Slider volumeSlider;
+    public TextMeshProUGUI volumeText;
+
+    public Button startButton;
+    public Button playPreviewButton;
+
+    public void SetVolume(float volume)
+    {
+        volume = Mathf.Clamp(volume, 0.001f, 10f);
+        independentMixerGroup.audioMixer.SetFloat(AudioManager.kVisualizationVolume, Mathf.Log(volume) * 20f);
+    }
+
     private void OnEnable()
     {
         RefreshFiles();
+        volumeSlider.value = 1f;
+        OnVolumeSliderChanged(1f);
     }
 
     public void RefreshFiles() {
@@ -122,19 +138,9 @@ public class Menu : MonoBehaviour
                 videoPlayer.url = $"file://{selectedVideoClipPath}";
             }
             if (videoPlayer.isPlaying)
-            {
                 videoPlayer.Pause();
-                previewButtonLabel.text = "PLAY";
-                videoDropdown.enabled = true;
-                useVideoAudioToggle.interactable = true;
-            }
             else
-            {
                 videoPlayer.Play();
-                previewButtonLabel.text = "PAUSE";
-                videoDropdown.enabled = false;
-                useVideoAudioToggle.interactable = false;
-            }
             //previewButtonLabel.text = $"{(videoPlayer.isPlaying ? "PAUSE" : "PREVIEW")}"; Didn't work idk
         }
     }
@@ -144,4 +150,25 @@ public class Menu : MonoBehaviour
             selectedVideoClipPath = _videoClips[index];
         }
     }
+
+    private void Update()
+    {
+        if (videoPlayer && previewButtonLabel)
+        {
+            previewButtonLabel.text = $"{(videoPlayer.isPlaying ? "PAUSE" : "PREVIEW")}";
+            videoDropdown.enabled = !videoPlayer.isPlaying && !string.IsNullOrEmpty(selectedVideoClipPath);
+            useVideoAudioToggle.interactable = !videoPlayer.isPlaying && !string.IsNullOrEmpty(selectedVideoClipPath);
+        }
+
+        if (startButton) {
+            startButton.interactable = _audioClips.Count > 0;
+        }
+    }
+
+    public void OnVolumeSliderChanged(float vol) {
+        SetVolume(vol);
+        if (volumeText)
+            volumeText.text = $"Volume: {Mathf.RoundToInt((vol / 2.718f) * 100f)}";
+    }
+
 }

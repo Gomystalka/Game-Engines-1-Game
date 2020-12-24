@@ -57,8 +57,8 @@ public sealed class AudioManager : MonoBehaviour {
             Destroy(this);
             return;
         }
-        if (volumeIndependentMixerGroup)
-            SetVolume(volume);
+        //if (volumeIndependentMixerGroup)
+            //SetVolume(volume);
     }
 
     private void OnEnable() {
@@ -121,7 +121,7 @@ public sealed class AudioManager : MonoBehaviour {
 
         FindFrequencyBands();
         SmoothenFrequencyBands();
-        SetVolume(volume);
+        //SetVolume(volume);
         if (algorithm == BeatDetectionAlgorithm.FrequencyEnergy)
             UpdateCConstantBeatDetection();
         else
