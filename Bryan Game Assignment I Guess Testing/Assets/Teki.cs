@@ -10,15 +10,17 @@ public class Teki : AudioBehaviour
     private Mesh _mesh;
     private Vector3[] _baseVertices;
 
-    private int _vertexIndex = 0;
-    [SerializeField] private float[] _vertexInfo;
-    private float _currentAverage;
-    private int _framesBetweenCaptures;
+    //private int _vertexIndex = 0;
+    //[SerializeField] private float[] _vertexInfo;
+    //private float _currentAverage;
+    //private int _framesBetweenCaptures;
+    /*
     public bool Capturing {
         get {
             return _vertexIndex < _mesh.vertexCount;
         }
     }
+    */
 
     //private Timer _dataCaptureTimer; //Too imprecise for lower delays
 
@@ -34,7 +36,7 @@ public class Teki : AudioBehaviour
             _mesh = _meshFilter.sharedMesh;
         if (_mesh)
         {
-            _vertexInfo = new float[_mesh.vertexCount];
+            //_vertexInfo = new float[_mesh.vertexCount];
             _baseVertices = _mesh.vertices;
         }
         else
@@ -61,6 +63,7 @@ public class Teki : AudioBehaviour
         EndDataCapture();
         StartCoroutine(CaptureData(VisualizationSettings.kEnemyDataCaptureIntervalSeconds / (float)_mesh.vertexCount));
     */
+        ManipulateVertices();
     }
 
     /*
@@ -104,11 +107,18 @@ public class Teki : AudioBehaviour
         ManipulateVertices();
     }
     */
+    public override void Update()
+    {
+        base.Update();
+    }
 
     private void ManipulateVertices() {
         Mesh m = _meshFilter.mesh; //Get mesh instance
         Vector3[] _vertices = _baseVertices;
-        for (int i = 0; i < _vertexInfo.Length; i++)
+        int spectrumFactor = Mathf.FloorToInt(_baseVertices.Length / FrequencyBands.Length - 1);
+        Debug.Log(FrequencyBands.Length);
+        for (int i = 0; i < _baseVertices.Length; i++)
+            _vertices[i] += m.normals[i] * FrequencyBands[Mathf.Clamp(Mathf.FloorToInt(i / spectrumFactor), 0, FrequencyBands.Length - 1)].frequency;
                 //_vertices[i] += _vertexInfo[i] * SampleScalar * _mesh.normals[i];
         m.vertices = _vertices;
         m.RecalculateNormals();
