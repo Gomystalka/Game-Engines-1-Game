@@ -62,6 +62,7 @@ public sealed class AudioManager : MonoBehaviour {
     }
 
     private void OnEnable() {
+        PlayerDead = false;
         if (!source)
             source = GetComponent<AudioSource>();
 
