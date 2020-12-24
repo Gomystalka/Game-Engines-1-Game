@@ -86,7 +86,7 @@ public class VisualizedCustomTerrain : AudioBehaviour
         if (!Source.isPlaying) return;
         if (AudioManager.PlayerDead)
         {
-            if(videoPlayer && videoPlayer.isPlaying && videoPlayer.enabled && videoPlayer.audioOutputMode == VideoAudioOutputMode.AudioSource)
+            if(videoPlayer && videoPlayer.isPlaying && videoPlayer.enabled && Menu.useVideoAudio)
                 videoPlayer.playbackSpeed = Mathf.MoveTowards(videoPlayer.playbackSpeed, 0f, 0.15f * Time.deltaTime);
             else if(Clip && Source.isPlaying)
                 Source.pitch = Mathf.Lerp(Source.pitch, 0f, Time.deltaTime);
@@ -117,7 +117,7 @@ public class VisualizedCustomTerrain : AudioBehaviour
 
             float len = 0f;
             float time = 0f;
-            if (videoPlayer && videoPlayer.isPlaying && videoPlayer.enabled && videoPlayer.audioOutputMode == VideoAudioOutputMode.AudioSource)
+            if (videoPlayer && videoPlayer.isPlaying && videoPlayer.enabled && Menu.useVideoAudio)
             {
                 len = (float)videoPlayer.length;
                 time = (float)videoPlayer.time;

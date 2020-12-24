@@ -5,6 +5,8 @@ using TMPro;
 using UnityEngine.Video;
 using UnityEngine.UI;
 using UnityEngine.Audio;
+using UnityEngine.Networking;
+using NAudio.Wave;
 
 public class Menu : MonoBehaviour
 {
@@ -20,6 +22,7 @@ public class Menu : MonoBehaviour
     public Toggle useVideoAudioToggle;
     public Toggle loopVideoToggle;
     public TextMeshProUGUI previewButtonLabel;
+    public TextMeshProUGUI audioPreviewButtonLabel;
 
     private List<string> _videoClips;
     private List<string> _audioClips;
@@ -35,6 +38,9 @@ public class Menu : MonoBehaviour
 
     public Button startButton;
     public Button playPreviewButton;
+
+    public AudioSource previewSource;
+    public GameObject previewObject;
 
     public void SetVolume(float volume)
     {
@@ -59,6 +65,7 @@ public class Menu : MonoBehaviour
         videoDropdown.ClearOptions();
         string path = System.IO.Path.Combine(Application.streamingAssetsPath, "Music");
         List<string> elements = new List<string>();
+        _videoClips.Add("None");
         if (System.IO.Directory.Exists(path))
         {
             foreach (string f in System.IO.Directory.GetFiles(path)) {
@@ -74,10 +81,13 @@ public class Menu : MonoBehaviour
             }
         }
         if (elements.Count > 0)
+        {
             musicDropdown.AddOptions(elements);
+            OnAudioClipSelected(0);
+        }
 
         elements.Clear();
-
+        elements.Add("None");
         path = System.IO.Path.Combine(Application.streamingAssetsPath, "Videos");
         if (System.IO.Directory.Exists(path))
         {
@@ -96,7 +106,7 @@ public class Menu : MonoBehaviour
                 }
             }
         }
-        if (elements.Count > 0)
+        if (elements.Count > 1)
         {
             videoDropdown.AddOptions(elements);
             selectedVideoClipPath = _videoClips[0];
@@ -105,8 +115,6 @@ public class Menu : MonoBehaviour
         List<string> empty = new List<string>(new string[] { "None" });
         if (musicDropdown.options.Count == 0)
             musicDropdown.AddOptions(empty);
-        if (videoDropdown.options.Count == 0)
-            videoDropdown.AddOptions(empty);
         elements.Clear();
     }
 
@@ -132,6 +140,7 @@ public class Menu : MonoBehaviour
     public void OnPreviewButtonClicked() {
         if (previewButtonLabel && videoPlayer)
         {
+            if (selectedVideoClipPath == "None") return;
             if (selectedVideoClipPath != _previouslyLoadedVideo)
             {
                 _previouslyLoadedVideo = selectedVideoClipPath;
@@ -145,10 +154,87 @@ public class Menu : MonoBehaviour
         }
     }
 
-    public void OnVideoSelected(int index) {
-        if (videoDropdown && index < _videoClips.Count) {
+    public void OnAudioPreviewButtonClicked()
+    {
+        if (previewSource) {
+            if (previewSource.isPlaying)
+                previewSource.Pause();
+            else
+                previewSource.Play();
+        }
+    }
+
+    public void OnVideoSelected(int index)
+    {
+        if (index == 0) return;
+        if (videoDropdown && index < _videoClips.Count)
+        {
             selectedVideoClipPath = _videoClips[index];
         }
+    }
+
+    public void OnAudioClipSelected(int index) {
+        if (musicDropdown && index < _audioClips.Count)
+        {
+            string f = _audioClips[index];
+            StartCoroutine(GetAudioClip(f, System.IO.Path.GetFileName(f), index));
+        }
+    }
+
+    IEnumerator GetAudioClip(string path, string name, int replaceIndex)
+    {
+        AudioType t = GetTypeFromFile(name);
+        if (t != AudioType.MPEG) {
+
+            using (UnityWebRequest r = UnityWebRequestMultimedia.GetAudioClip(path, t))
+            {
+                yield return r.SendWebRequest();
+
+                if (r.isNetworkError || r.isHttpError)
+                    Debug.Log(r.error);
+                else
+                {
+                    selectedClip = DownloadHandlerAudioClip.GetContent(r);
+                    if (selectedClip)
+                        previewSource.clip = selectedClip;
+                }
+            }
+
+            if (selectedClip)
+                previewSource.clip = selectedClip;
+        } else {
+            string p = ConvertMPEG(path, replaceIndex);
+            if (replaceIndex < _audioClips.Count)
+            {
+                _audioClips[replaceIndex] = p;
+                RefreshFiles();
+            }
+        }
+    }
+
+    private string ConvertMPEG(string path, int index) {
+        using (Mp3FileReader m = new Mp3FileReader(path)) {
+            using (WaveStream s = WaveFormatConversionStream.CreatePcmStream(m)) {
+                WaveFileWriter.CreateWaveFile(path + " WAV VER.wav", s);
+            }
+        }
+        string newPath = path + " WAV VER.wav";
+
+        if (!new System.IO.DirectoryInfo(path).Exists)
+            System.IO.File.Delete(path);
+        StartCoroutine(GetAudioClip(newPath, System.IO.Path.GetFileName(path + " WAV VER.wav"), index));
+        return newPath;
+    }
+
+    private AudioType GetTypeFromFile(string file) {
+        if (file.EndsWith(".aif"))
+            return AudioType.AIFF;
+        else if (file.EndsWith(".wav"))
+            return AudioType.WAV;
+        else if (file.EndsWith(".mp3"))
+            return AudioType.MPEG;
+        else
+            return AudioType.OGGVORBIS;
     }
 
     private void Update()
@@ -156,12 +242,14 @@ public class Menu : MonoBehaviour
         if (videoPlayer && previewButtonLabel)
         {
             previewButtonLabel.text = $"{(videoPlayer.isPlaying ? "PAUSE" : "PREVIEW")}";
+            audioPreviewButtonLabel.text = $"{(previewSource.isPlaying ? "PAUSE" : "PREVIEW")}";
             videoDropdown.enabled = !videoPlayer.isPlaying && !string.IsNullOrEmpty(selectedVideoClipPath);
-            useVideoAudioToggle.interactable = !videoPlayer.isPlaying && !string.IsNullOrEmpty(selectedVideoClipPath);
+            useVideoAudioToggle.interactable = !videoPlayer.isPlaying && !string.IsNullOrEmpty(selectedVideoClipPath) && selectedVideoClipPath != "None";
+            previewObject.SetActive(selectedVideoClipPath != "None");
         }
 
         if (startButton) {
-            startButton.interactable = _audioClips.Count > 0;
+            startButton.interactable = _audioClips.Count > 0 && selectedClip;
         }
     }
 
