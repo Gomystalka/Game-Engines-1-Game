@@ -112,14 +112,14 @@ public class CustomTerrain : MonoBehaviour
         //m.triangles = _tris;
         m.RecalculateNormals();
         m.RecalculateBounds();
-        m.RecalculateTangents();
+        //m.RecalculateTangents();
         if (Collider)
             Collider.sharedMesh = m;
 
         if (enableMirror)
         {
             _mirrorFilter.sharedMesh = m;
-            _mirrorCollider.sharedMesh = m;
+            //_mirrorCollider.sharedMesh = m;
         }
     }
 

@@ -84,6 +84,14 @@ public class VisualizedCustomTerrain : AudioBehaviour
     {
         base.Update();
         if (!Source.isPlaying) return;
+        if (AudioManager.PlayerDead)
+        {
+            if(videoPlayer && videoPlayer.isPlaying && videoPlayer.enabled && videoPlayer.audioOutputMode == VideoAudioOutputMode.AudioSource)
+                videoPlayer.playbackSpeed = Mathf.MoveTowards(videoPlayer.playbackSpeed, 0f, 0.15f * Time.deltaTime);
+            else if(Clip && Source.isPlaying)
+                Source.pitch = Mathf.Lerp(Source.pitch, 0f, Time.deltaTime);
+        }
+
         if (!player) return;
         Vector3 destination = transform.position + respawnOffset + (transform.TransformDirection(respawnOffsetDirection) * (_terrain.width * _terrain.spacing.x));
         float dist = Vector3.Distance(new Vector3(player.position.x, destination.y, player.position.z), new Vector3(player.position.x, destination.y, destination.z));
@@ -109,15 +117,17 @@ public class VisualizedCustomTerrain : AudioBehaviour
 
             float len = 0f;
             float time = 0f;
-            if (videoPlayer && videoPlayer.isPlaying && videoPlayer.enabled)
+            if (videoPlayer && videoPlayer.isPlaying && videoPlayer.enabled && videoPlayer.audioOutputMode == VideoAudioOutputMode.AudioSource)
             {
                 len = (float)videoPlayer.length;
                 time = (float)videoPlayer.time;
+
             }
             else if (Clip && Source.isPlaying)
             {
                 len = Clip.length;
                 time = Source.time;
+                    
             }
             else
                 return;

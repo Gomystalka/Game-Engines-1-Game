@@ -125,9 +125,6 @@ public sealed class AudioManager : MonoBehaviour {
             UpdateCConstantBeatDetection();
         else
             UpdateSpectralFluxBeatDetection();
-
-        if (PlayerDead)
-            source.pitch = Mathf.Lerp(source.pitch, 0f, 10f * Time.deltaTime);
     }
 
     public void ResetSpectrum()
