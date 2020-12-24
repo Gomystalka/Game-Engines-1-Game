@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.Audio;
 using UnityEngine.Networking;
 using NAudio.Wave;
+using UnityEngine.SceneManagement;
 
 public class Menu : MonoBehaviour
 {
@@ -259,4 +260,7 @@ public class Menu : MonoBehaviour
             volumeText.text = $"Volume: {Mathf.RoundToInt((vol / 2.718f) * 100f)}";
     }
 
+    public void LoadScene(int sceneIndex) {
+        SceneManager.LoadScene(sceneIndex);
+    }
 }

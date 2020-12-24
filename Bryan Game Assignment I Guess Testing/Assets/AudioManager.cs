@@ -63,8 +63,6 @@ public sealed class AudioManager : MonoBehaviour {
 
     private void OnEnable() {
         PlayerDead = false;
-        if (Menu.selectedClip)
-            source.clip = Menu.selectedClip;
         if (!source)
             source = GetComponent<AudioSource>();
 

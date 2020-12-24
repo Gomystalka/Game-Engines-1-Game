@@ -46,17 +46,26 @@ public class VisualizedCustomTerrain : AudioBehaviour
         _canRespawn = true;
         GenerateVisualizedHeight(true);
         OnBeatDetected.AddListener(OnBeat);
+        if (Source && !Menu.useVideoAudio)
+        {
+            Source.clip = Menu.selectedClip;
+            Source.Play();
+        }
 
         if (videoPlayer)
         {
-            videoPlayer.url = Menu.selectedVideoClipPath;
+            string u = Menu.selectedVideoClipPath;
+            videoPlayer.enabled = !string.IsNullOrEmpty(u) && u != "None";
+            if (!videoPlayer.enabled) return;
+
+            videoPlayer.url = u;
             videoPlayer.isLooping = Menu.loopVideo;
             videoPlayer.audioOutputMode = Menu.useVideoAudio ? VideoAudioOutputMode.AudioSource : VideoAudioOutputMode.None;
-            if (!string.IsNullOrEmpty(videoPlayer.url) && videoPlayer.url != "None")
-            {
-                videoPlayer.Stop();
-                videoPlayer.Play();
+            videoPlayer.Stop();
+            if (videoPlayer.audioOutputMode == VideoAudioOutputMode.AudioSource) {
+                videoPlayer.EnableAudioTrack(0, true);
             }
+            videoPlayer.Play();
         }
     }
 
