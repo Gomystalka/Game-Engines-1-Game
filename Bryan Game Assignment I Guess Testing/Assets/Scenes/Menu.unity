@@ -1836,7 +1836,7 @@ GameObject:
   - component: {fileID: 682411001}
   - component: {fileID: 682411000}
   m_Layer: 5
-  m_Name: Warning (1)
+  m_Name: Info
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1858,7 +1858,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0017700195}
+  m_AnchoredPosition: {x: 0, y: 0.0018310547}
   m_SizeDelta: {x: -640, y: -360.17963}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &682411000
@@ -1875,7 +1875,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -1889,7 +1889,12 @@ MonoBehaviour:
 
     Right Click to Shoot Rockets
 
-    Targetting is automatic.'
+    Targetting is automatic.
+
+    Shooting
+    is just for fun.
+
+    The usual purpose of this is for visualization.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1958,12 +1963,12 @@ MonoBehaviour:
   m_margin: {x: 13.012755, y: 0, z: 0, w: 14.33537}
   m_textInfo:
     textComponent: {fileID: 682411000}
-    characterCount: 115
+    characterCount: 189
     spriteCount: 0
-    spaceCount: 18
-    wordCount: 19
+    spaceCount: 31
+    wordCount: 32
     linkCount: 0
-    lineCount: 5
+    lineCount: 7
     pageCount: 1
     materialCount: 1
   m_isUsingLegacyAnimationComponent: 0
@@ -5480,7 +5485,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0017700195}
+  m_AnchoredPosition: {x: 0, y: 0.0018310547}
   m_SizeDelta: {x: -640, y: -360.17963}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1663137511
@@ -5497,7 +5502,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

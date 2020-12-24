@@ -179,6 +179,7 @@ public class Player : MonoBehaviour
         Camera.transform.SetParent(null, true);
         AudioManager.Instance.SpawnParticle(0, transform.position);
         AudioManager.PlayerDead = true;
+        AudioManager.Instance.Invoke("ReturnToMenu", 5f);
         Destroy(transform.root.gameObject);
     }
 }

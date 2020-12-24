@@ -46,6 +46,7 @@ public sealed class AudioManager : MonoBehaviour {
 
     [Header("Misc")]
     public GameObject[] particles;
+    public GameObject endScreen;
 
     private void Awake()
     {
@@ -80,6 +81,10 @@ public sealed class AudioManager : MonoBehaviour {
         FFTSpectrumDataChannel1 = new float[sampleCount];
         OnEnableCConstantBeatDetection();
         OnEnableSpectralFluxBeatDetection();
+    }
+
+    public void ReturnToMenu() {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 
     public void SetAudioDevice(int deviceIndex) {
@@ -126,6 +131,8 @@ public sealed class AudioManager : MonoBehaviour {
             UpdateCConstantBeatDetection();
         else
             UpdateSpectralFluxBeatDetection();
+        if(endScreen)
+            endScreen.SetActive(PlayerDead);
     }
 
     public void ResetSpectrum()
