@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-
+using UnityEngine.Video;
+using UnityEngine.UI;
 
 public class Menu : MonoBehaviour
 {
@@ -13,6 +14,10 @@ public class Menu : MonoBehaviour
     public static string selectedVideoClipPath;
     public TMP_Dropdown musicDropdown;
     public TMP_Dropdown videoDropdown;
+
+    public VideoPlayer videoPlayer;
+    public Toggle useVideoAudioToggle;
+    public TextMeshProUGUI previewButtonLabel;
 
     private void OnEnable()
     {
@@ -64,4 +69,27 @@ public class Menu : MonoBehaviour
         if (videoDropdown.options.Count == 0)
             videoDropdown.AddOptions(empty);
     }
+
+    public void OnVideoAudioToggle() {
+        if (useVideoAudioToggle && musicDropdown)
+            musicDropdown.gameObject.SetActive(!useVideoAudioToggle.isOn);
+    }
+
+    public void OnPreviewButtonClicked() {
+        if (previewButtonLabel && videoPlayer)
+        {
+            if (videoPlayer.isPlaying)
+            {
+                videoPlayer.Pause();
+                previewButtonLabel.text = "PLAY";
+            }
+            else
+            {
+                videoPlayer.Play();
+                previewButtonLabel.text = "PAUSE";
+            }
+            //previewButtonLabel.text = $"{(videoPlayer.isPlaying ? "PAUSE" : "PREVIEW")}"; Didn't work idk
+        }
+    }
+
 }
