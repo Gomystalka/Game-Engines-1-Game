@@ -43,6 +43,9 @@ public sealed class AudioManager : MonoBehaviour {
     public float beatStrengthThresholdMultiplier = 1.5f;
     public BeatDetectionAlgorithm algorithm = BeatDetectionAlgorithm.FrequencyEnergy;
 
+    [Header("Misc")]
+    public GameObject[] particles;
+
     private void Awake()
     {
         if (Instance == null)
@@ -391,9 +394,16 @@ public sealed class AudioManager : MonoBehaviour {
 
     #endregion
 
-    #region Frequency Energy Beat Detection
-
-    #endregion
+    public void SpawnParticle(int particleIndex, Vector3 position) {
+        if (particleIndex < particles.Length)
+        {
+            GameObject go = Instantiate(particles[particleIndex], position, Quaternion.identity);
+            ParticleSystem ps = go.GetComponent<ParticleSystem>();
+            ParticleSystem.MainModule m = ps.main;
+            m.startColor = Color.HSVToRGB(VisualizedCustomTerrain.InverseHue, 1f, 1f);
+            Destroy(go, 4f);
+        }
+    }
 }
 
 public class Timer {

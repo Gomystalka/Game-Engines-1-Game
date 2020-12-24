@@ -11,6 +11,8 @@ public class Teki : AudioBehaviour
     private Mesh _mesh;
     private Vector3[] _baseVertices;
 
+    public const int kHitPoints = 4;
+
     //private int _vertexIndex = 0;
     //[SerializeField] private float[] _vertexInfo;
     //private float _currentAverage;
@@ -30,6 +32,7 @@ public class Teki : AudioBehaviour
 
     private float _spinSpeed;
     private Vector3 _direction;
+    private int _hitPoints;
 
     public override void OnEnable()
     {
@@ -70,6 +73,7 @@ public class Teki : AudioBehaviour
     */
         _spinSpeed = Random.Range(5f, 30f);
         _direction = RandomizeDirection();
+        _hitPoints = kHitPoints;
         //ManipulateVertices();
     }
 
@@ -151,5 +155,25 @@ public class Teki : AudioBehaviour
 
     private Vector3 RandomizeDirection() {
         return new Vector3(Random.Range(-1, 2), Random.Range(-1, 2), Random.Range(-1, 2));
+    }
+
+    private void Kill() {
+        AudioManager.Instance.SpawnParticle(0, transform.position);
+        Destroy(gameObject);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Rocket"))
+        {
+            Kill();
+            Destroy(other.gameObject);
+        }
+        else if (other.CompareTag("Projectile")) {
+            _hitPoints--;
+            if (_hitPoints <= 0)
+                Kill();
+            Destroy(other.gameObject);
+        }
     }
 }

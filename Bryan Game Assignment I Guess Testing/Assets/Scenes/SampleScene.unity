@@ -2672,6 +2672,7 @@ MonoBehaviour:
     type: 2}
   beatStrengthThresholdMultiplier: 1
   algorithm: 1
+  particles: []
   beatSensitivity: -10
   previousSampleCount: 48
   beatDetectionThresholdMultiplier: 1.5
