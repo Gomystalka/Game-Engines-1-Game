@@ -1,13 +1,22 @@
 <h1>Game Engines 1 Assignment</h1>
-<h2>Tomasz Galka - C18740411 - DT508</h2>
+<h2>Name: <b>Tomasz Galka</b></h2>
+<h2>Student Number: <b>C18740411</b></h2>
+<h2>Class Group: <b>DT508</b></h2>
 <h1>I NEED TO UPDATE THIS TOMORROW</h1>
+
+<h1><size=32>CONTENT WARNING</size></h1>
 
 <p>Unity Version: <b>Unity 2019.4.1f1</b>
 <p>This project is being made for educational purposes only.</p>
 <p>Any credits will be made within the game and on this repository</p>
 <p><b>ALL</b> assets so far are mine (scripts, models, etc)</p>
 
-<h1>Game Idea Overview</h1>
+<h1>Description of the project</h1>
+<p>Due to time constraints and many issues some previous features had to be scrapped. This project is a game/music visualizer made in the <b>Unity 2019.4.1f1</b> game Engine (Education Edition). The main purpose of this game is for music visualization and possible VJing due to one of the features. The project contains a procedurally-generated map using Perlin Noise and a custom terrain written by me. This terrain is generated with correct UVs which allows one of the best features to work; the ability to display any video file on the terrain. The video file must be put into the <i>StreamingAssets/Videos</i> folder to be detected by the game. This is the same for the audio file, except audio files must be placed within the <i>StreamingAssets/Music</i> folder instead. 
+
+The game's main purpose is once again, for visualization, however there are shooting mechanics implemented in order to make the game slightly more fun. The control scheme of the game was inspired by <b>Star Fox 64</b> created by <i>Nintendo</i>.</p>
+
+<h1>Previous Proposal</h1>
 <p>This'll be a bullet-hell 3D game for which the enemies and certain parts of the map will be either randomly generated, generated based off spectrum data from an audio file of choice or preset but will react to music. The surrounding landscape will also change based on the audio file provided. The music will be freely interchangable by the player/user and most of the map will be generated as the music plays. There will be a length restriction placed on the imported audio file as to avoid both too long and too short clips.This assignment will be developed through the use of the <b>Unity 2019.4.1f1</b> Game Engine.</p>
 <h1>Implementation Overview</h1>
 <p>The overall difficulty of the map will be determined by the audio file provided. UI will consist of a generic menu with an option to select an audio file. Most if not all of the landscape/world will be procedurally-generated/generated relative to the spectrum data as the game plays. There will be no pre-processing of any kind therefore the game will not support pre-made maps.</p>
