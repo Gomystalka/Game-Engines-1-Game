@@ -119,13 +119,15 @@ private static Vector2 _goodAxis;
 <p>Finally, the loading of the files was achieved through the use of the <b>UnityWebRequest</b> class which loads a file from a URL which supports both HTTP and File protocols. The loading of the video file is natively supported by the Video Player component.</p>
 
 <h1>References</h1>
-<b>Star Fox 64</b> by <i>Nintento<i>
-<b>Minim for Processing</b> by <i>ddf/Compartmental</i> 
-<b>Unity Docs</b>
-<b>Stackoverflow</b>
+<ul>
+    <li><b>Star Fox 64</b> by <i>Nintento<i></li>
+    <li><b><b>Minim for Processing</b> by <i>ddf/Compartmental</i></li>
+    <li><b>Unity Docs</b></li>
+    <li><b>Stackoverflow</b></li>
+</ul>
         
 <h1>What I am most proud of in the assignment</h1>
-<p>I am very proud of how the custom terrain generation and visualization turned out. Despite my limited knowledge of ShaderLab, HLSL and mesh manipulation, I managed to create a fairly optimized and fully working terrain generation system which can be altered in many ways and supports many materials when the appropriate shader is used.
+<p>I am very proud of how the custom terrain generation and visualization turned out. Despite my limited knowledge of ShaderLab, HLSL and mesh manipulation, I managed to create a fairly optimized and fully working terrain generation system which can be altered in many ways and supports many materials when the appropriate shader is used.</p>
 
 <h1>Project Feature Overview</h1>
 <ul>
@@ -157,8 +159,8 @@ private static Vector2 _goodAxis;
 
 <h1>Credits</h1>
 <ul>
- Adam Bielecki (theadambielecki@gmail.com) - Amazing Skybox
- Mark Heath - NAudio - I love you.
+ <li> Adam Bielecki (theadambielecki@gmail.com) - Amazing Skybox</li>
+ <li> Mark Heath - NAudio - I love you.</li>
 </ul>
 <h2>This is <b><u>NOT</u></b> a commercial project. It is completely free and always will be.</h2>
 
