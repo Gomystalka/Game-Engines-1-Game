@@ -20,11 +20,10 @@ The game's main purpose is once again, for visualization, however there are shoo
 <p>The game should be fully usable when pulled/downloaded within the editor or when built within the editor. The custom video files must be put into the <i>StreamingAssets/Videos</i> folder to be detected by the game. This is the same for the audio file, except audio files must be placed within the <i>StreamingAssets/Music</i> folder instead. The game cannot pe played when there is no audio file loaded so make sure there is one present within the specified folder!
 
 <h1>How it works</h1>
-Under the hood, the game is powered by a large amount of systems. The brain of the game lies within the <b>AudioManager</b> class. This is the class responsible for 
-analyzing the audio, splitting the audio into frequency bands, and detecting beats through the use of the <i>Frequency Energy</i> or <i>Spectral Flux</i> algorithms (Changeable however Frequency Energy proved to be more reliable.) The second most important class is the <b>AudioBehaviour</b> class. This class is an abstract class which exposes all Spectrum information to any class that inherits it. The <b>CustomVisualizedTerrain</b> class makes heavy use of it for hooking the OnBeat event and changing the terrain color and terrain shader line width based on the combined frequency data of the first, second and third band. This data is then mapped into the <i>HSV</i> color space for a rainbow effect. 
+<p>Under the hood, the game is powered by a large amount of systems. The brain of the game lies within the <b>AudioManager</b> class. This is the class responsible for analyzing the audio, splitting the audio into frequency bands, and detecting beats through the use of the <i>Frequency Energy</i> or <i>Spectral Flux</i> algorithms (Changeable however Frequency Energy proved to be more reliable.) The second most important class is the <b>AudioBehaviour</b> class. This class is an abstract class which exposes all Spectrum information to any class that inherits it. The <b>CustomVisualizedTerrain</b> class makes heavy use of it for hooking the OnBeat event and changing the terrain color and terrain shader line width based on the combined frequency data of the first, second and third band. This data is then mapped into the <i>HSV</i> color space for a rainbow effect.</p>
 
-There is another important class which takes care of screen bounds collision, <b>ScreenBoundsColliderOld</b>. Old is in the name due to a previous naming mistake which I forgot to fix. This behaviour is achieved by first calculating the frustum corners of the camera and converting them into world space, then in order for all directions and rotations to function correctly, distance calculations and the Dot product is used in order to find out whether the player's distance is positive or negative (Outside the bounds). This function looks like this. It uses a combined enum for precise collision identification.
-```
+<p>There is another important class which takes care of screen bounds collision, <b>ScreenBoundsColliderOld</b>. Old is in the name due to a previous naming mistake which I forgot to fix. This behaviour is achieved by first calculating the frustum corners of the camera and converting them into world space, then in order for all directions and rotations to function correctly, distance calculations and the Dot product is used in order to find out whether the player's distance is positive or negative (Outside the bounds). This function looks like this. It uses a combined enum for precise collision identification.</p>
+```CSharp
 public CollisionLocation Constrain3DObject(Transform objectTransform, bool collisionInfoOnly = false) {
         yMidPoint = new Vector3(FrustumCorners[3].x, objectTransform.position.y, FrustumCorners[3].z);
         xMidPoint = FrustumCorners[3] - (FrustumCorners[3] - FrustumCorners[1]).normalized * Vector3.Distance(objectTransform.position, yMidPoint);
@@ -68,13 +67,70 @@ public CollisionLocation Constrain3DObject(Transform objectTransform, bool colli
         return location;
     }
 ```
+<p>There is also a <b>Player</b> and <b>Camera Controller</b> class which take care of the player movement through data fetched from a custom function in my <b>Utilities</b> class called <i>GetGoodAxis</i> which returns a smoothed value just like <i>Input.GetAxis("")</i> however the smooth rate is customizable and an annoying bug which snaps the axis value if the opposite button is pressed is completely fixed. This function is simple under the hood.</p>
+```CSharp
+private static Vector2 _goodAxis;
+    private static Vector2 _goodAxisRaw;
+    public static float inputInterpolationSpeed = 1f;
+
+    public static float GetGoodAxis(string axis)
+    {
+        float value = 0f;
+        if (axis == "Horizontal")
+        {
+            value = _goodAxis.x;
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+                value = Mathf.MoveTowards(_goodAxis.x, -1f, inputInterpolationSpeed * Time.deltaTime);
+            else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+                value = Mathf.MoveTowards(_goodAxis.x, 1f, inputInterpolationSpeed * Time.deltaTime);
+            else
+                value = Mathf.MoveTowards(_goodAxis.x, 0f, inputInterpolationSpeed * Time.deltaTime);
+            _goodAxis = new Vector2(value, _goodAxis.y);
+            return value;
+        }
+        else if (axis == "Vertical")
+        {
+            value = _goodAxis.y;
+            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+                value = Mathf.MoveTowards(_goodAxis.y, 1f, inputInterpolationSpeed * Time.deltaTime);
+            else if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+                value = Mathf.MoveTowards(_goodAxis.y, -1f, inputInterpolationSpeed * Time.deltaTime);
+            else
+                value = Mathf.MoveTowards(_goodAxis.y, 0f, inputInterpolationSpeed * Time.deltaTime);
+
+            _goodAxis = new Vector2(_goodAxis.x, value);
+
+            return value;
+        }
+        return value;
+    }
+```
+<p>The KeyCode values however are currently hardcoded but it would be difficult to specify custom values.</p>
+
+<p>The visualization on the terrain is done through the use of custom mesh generation within the <b><CustomTerrain</b> class. The terrain first generates a plane with a set amount of vertices determined by the <i>Width</i> and <i>Height</i> parameters. The terrain is then divided up into Chunks which store the indices and X and Y positions of each vertex within said chunk. There is also a function within the Chunk object which remaps a X and Y value into the specified chunk's X and Y value, then clamps it. Through the use of this, a seamless terrain generation could be achieved by teleporting the terrain's start point to the player's forward once the player reaches a certain point on the terrain. When this point is reached, the last three chunks are copied and pasted into the first three chunks and the chunks after the first three are regenerated based on Perlin Noise data. The visualization of the video on the terrain was achieved through the use of the <b>Video Player</b> Unity component and a custom shader (<b>ScalableStandard</b>) which scaled the texture as for some reason Unity renders the video on the terrain at a very big scale by default. The terrain wireframe was also achieved through a modified built-in Unity shader (<b>WireframeShaderEx</b>).</p>
+        
+<p>The enemy spawns are determined by the beat of the audio file specified. A beat detection algorithm is used in order to detect beats within a song, and when one is detected, an enemy is spawned. In order to avoid too many enemies spawning, a time between spawns value was added. The shape of the enemy is determined by the data from the Spectrum at the time of the beat that spawns said enemy. In order to not cull backfaces for when the enemy faces become too distorted, the Standard Unity shader (<b>NoCullingStandardShader</b>) was modified to not Cull anything.</p>
+
+<p>The lighting effects were added thorugh Unity's Post Processing package. Effects involved were mainly Bloom and Color Grading.</p>
+
+<p>Finally, the loading of the files was achieved through the use of the <b>UnityWebRequest</b> class which loads a file from a URL which supports both HTTP and File protocols. The loading of the video file is natively supported by the Video Player component.</p>
+
+<h1>References</h1>
+<b>Star Fox 64</b> by <i>Nintento<i>
+<b>Minim for Processing</b> by <i>ddf/Compartmental</i> 
+<b>Unity Docs</b>
+<b>Stackoverflow</b>
+        
+<h1>What I am most proud of in the assignment</h1>
+<p>I am very proud of how the custom terrain generation and visualization turned out. Despite my limited knowledge of ShaderLab, HLSL and mesh manipulation, I managed to create a fairly optimized and fully working terrain generation system which can be altered in many ways and supports many materials when the appropriate shader is used.
+
 <h1>Project Feature Overview</h1>
 <ul>
  <li>Procedural Generation</li>
  <li>Audio Visualization</li>
- <
  <li>Custom Editor Inspector for the <b>AudioManager</b> class</li>
- <li>Toggleable Settings UI</li>
+ <li>Interchangable Video and Audio files</li>
+ <li>Support for MP3 files thanks to NAudio!</li>
 </ul>
 <h1>Required Asset Overview</h1>
 <ol>
@@ -88,23 +144,19 @@ public CollisionLocation Constrain3DObject(Transform objectTransform, bool colli
  <li>AudioBehaviour class created (Abstract class exposing certain methods and fields to aid visualization.)</li>
 </ul>
 <h1>Gameplay Demo</h1>
-<i>To be populated by a video showcasing the gameplay...</i>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/oLE2dOjXtI4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 <h1>Controls</h1>
 <ul>
- N/A
+        <li><b>WSAD</b>: Move</li>
+        <li><b>Left Mouse Button</b>: Fire Lasers</li>
+        <li><b>Right Mouse Button</b>: Fire Rockets when you have a target</li>
 </ul>
+
 <h1>Credits</h1>
 <ul>
- N/A
+ Adam Bielecki (theadambielecki@gmail.com) - Amazing Skybox
+ Mark Heath - NAudio - I love you.
 </ul>
-<h1>Screenshots</h1>
-<ul>
- N/A
-</ul>
- 
- <h2>Well, I guess <a href="https://www.urbandictionary.com/define.php?term=Ganbaruby"><b>GanbaRuby</b></a> to me.</h2>
-<img src="https://media1.tenor.com/images/61bcbafc85870fdb1db95ac298f9b8f8/tenor.gif?itemid=7273202" width=50% height=50%/>
-
 <h2>This is <b><u>NOT</u></b> a commercial project. It is completely free and always will be.</h2>
 
 <h1>Previous Proposal</h1>
