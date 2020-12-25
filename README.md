@@ -17,12 +17,13 @@
 The game's main purpose is once again, for visualization, however there are shooting mechanics implemented in order to make the game slightly more fun. The control scheme of the game was inspired by <b>Star Fox 64</b> created by <i>Nintendo</i>.</p>
 
 <h1>Instructions for use</h1>
-<p>The game should be fully usable when pulled/downloaded within the editor or when built within the editor. The custom video files must be put into the <i>StreamingAssets/Videos</i> folder to be detected by the game. This is the same for the audio file, except audio files must be placed within the <i>StreamingAssets/Music</i> folder instead. The game cannot pe played when there is no audio file loaded so make sure there is one present within the specified folder!
+<p>The game should be fully usable when pulled/downloaded within the editor or when built within the editor. The custom video files must be put into the <i>StreamingAssets/Videos</i> folder to be detected by the game. This is the same for the audio file, except audio files must be placed within the <i>StreamingAssets/Music</i> folder instead. The game cannot pe played when there is no audio file loaded so make sure there is one present within the specified folder!</p>
 
 <h1>How it works</h1>
 <p>Under the hood, the game is powered by a large amount of systems. The brain of the game lies within the <b>AudioManager</b> class. This is the class responsible for analyzing the audio, splitting the audio into frequency bands, and detecting beats through the use of the <i>Frequency Energy</i> or <i>Spectral Flux</i> algorithms (Changeable however Frequency Energy proved to be more reliable.) The second most important class is the <b>AudioBehaviour</b> class. This class is an abstract class which exposes all Spectrum information to any class that inherits it. The <b>CustomVisualizedTerrain</b> class makes heavy use of it for hooking the OnBeat event and changing the terrain color and terrain shader line width based on the combined frequency data of the first, second and third band. This data is then mapped into the <i>HSV</i> color space for a rainbow effect.</p>
 
 <p>There is another important class which takes care of screen bounds collision, <b>ScreenBoundsColliderOld</b>. Old is in the name due to a previous naming mistake which I forgot to fix. This behaviour is achieved by first calculating the frustum corners of the camera and converting them into world space, then in order for all directions and rotations to function correctly, distance calculations and the Dot product is used in order to find out whether the player's distance is positive or negative (Outside the bounds). This function looks like this. It uses a combined enum for precise collision identification.</p>
+
 ```CSharp
 public CollisionLocation Constrain3DObject(Transform objectTransform, bool collisionInfoOnly = false) {
         yMidPoint = new Vector3(FrustumCorners[3].x, objectTransform.position.y, FrustumCorners[3].z);
@@ -68,6 +69,7 @@ public CollisionLocation Constrain3DObject(Transform objectTransform, bool colli
     }
 ```
 <p>There is also a <b>Player</b> and <b>Camera Controller</b> class which take care of the player movement through data fetched from a custom function in my <b>Utilities</b> class called <i>GetGoodAxis</i> which returns a smoothed value just like <i>Input.GetAxis("")</i> however the smooth rate is customizable and an annoying bug which snaps the axis value if the opposite button is pressed is completely fixed. This function is simple under the hood.</p>
+
 ```CSharp
 private static Vector2 _goodAxis;
     private static Vector2 _goodAxisRaw;
@@ -105,6 +107,7 @@ private static Vector2 _goodAxis;
         return value;
     }
 ```
+
 <p>The KeyCode values however are currently hardcoded but it would be difficult to specify custom values.</p>
 
 <p>The visualization on the terrain is done through the use of custom mesh generation within the <b><CustomTerrain</b> class. The terrain first generates a plane with a set amount of vertices determined by the <i>Width</i> and <i>Height</i> parameters. The terrain is then divided up into Chunks which store the indices and X and Y positions of each vertex within said chunk. There is also a function within the Chunk object which remaps a X and Y value into the specified chunk's X and Y value, then clamps it. Through the use of this, a seamless terrain generation could be achieved by teleporting the terrain's start point to the player's forward once the player reaches a certain point on the terrain. When this point is reached, the last three chunks are copied and pasted into the first three chunks and the chunks after the first three are regenerated based on Perlin Noise data. The visualization of the video on the terrain was achieved through the use of the <b>Video Player</b> Unity component and a custom shader (<b>ScalableStandard</b>) which scaled the texture as for some reason Unity renders the video on the terrain at a very big scale by default. The terrain wireframe was also achieved through a modified built-in Unity shader (<b>WireframeShaderEx</b>).</p>
