@@ -53,7 +53,7 @@ public class MonobehaviourEditorExtension : Editor
         _excludedProperties.Clear();
        FieldInfo[] fields = target.GetType().GetFields();
         foreach (FieldInfo f in fields) {
-            if(Attribute.GetCustomAttribute(f, typeof(GayAttribute)) is GayAttribute attr)
+            if(Attribute.GetCustomAttribute(f, typeof(RainbowAttribute)) is RainbowAttribute attr)
                 _excludedProperties.Add(new Bonanza() {
                     fieldName = f.Name,
                     randomizeValue = attr.RandomValue
