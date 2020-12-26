@@ -11,6 +11,7 @@
 <p>Any credits will be made within the game and on this repository</p>
 <p><b>ALL</b> assets apart from <b>NAudio.dll, Audio.xml and MilkyWay Skybox</b> were created by me.</p>
 <p>NAudio had to be used as Unity does not support .MP3 file streaming due to licensing issues.</p>
+<p>A build of this game can be downloaded from the Releases section on this Repo!</p>
 
 <h1>Description of the project</h1>
 <p>Due to time constraints and many issues some previous features had to be scrapped. This project is a game/music visualizer made in the <b>Unity 2019.4.1f1</b> game Engine (Education Edition). The main purpose of this game is for music visualization and possible VJing due to one of the features. The project contains a procedurally-generated map using Perlin Noise and a custom terrain. This terrain is generated with correct UVs which allows one of the best features to work; the ability to display any video file on the terrain which gives it VJ potential. Both the video and audio files can be changed by the user which gives the game a lot of customizability.
@@ -18,6 +19,8 @@ The game's main purpose is once again, for visualization, however there are shoo
 
 <h1>Instructions for use</h1>
 <p>The game should be fully usable when pulled/downloaded within the editor or when built within the editor. The custom video files must be put into the <i>StreamingAssets/Videos</i> folder to be detected by the game. This is the same for the audio file, except audio files must be placed within the <i>StreamingAssets/Music</i> folder instead. The game cannot pe played when there is no audio file loaded so make sure there is one present within the specified folder!</p>
+<h2>Here is a quick tutorial I made on how to add new files to the game. Works for both the build and the project.</h2>
+<a href="https://youtu.be/hX1wSNZUnRg"><img src="http://img.youtube.com/vi/hX1wSNZUnRg/0.jpg" title="Game Engines Assignment 1 Custom Audio and Video Tutorial"/></a>
 
 <h1>How it works</h1>
 <p>Under the hood, the game is powered by a large amount of systems. The brain of the game lies within the <b>AudioManager</b> class. This is the class responsible for analyzing the audio, splitting the audio into frequency bands, and detecting beats through the use of the <i>Frequency Energy</i> or <i>Spectral Flux</i> algorithms (Changeable however Frequency Energy proved to be more reliable.) The second most important class is the <b>AudioBehaviour</b> class. This class is an abstract class which exposes all Spectrum information to any class that inherits it. The <b>CustomVisualizedTerrain</b> class makes heavy use of it for hooking the OnBeat event and changing the terrain color and terrain shader line width based on the combined frequency data of the first, second and third band. This data is then mapped into the <i>HSV</i> color space for a rainbow effect.</p>
@@ -116,7 +119,9 @@ private static Vector2 _goodAxis;
 
 <p>The lighting effects were added thorugh Unity's Post Processing package. Effects involved were mainly Bloom and Color Grading.</p>
 
-<p>Finally, the loading of the files was achieved through the use of the <b>UnityWebRequest</b> class which loads a file from a URL which supports both HTTP and File protocols. The loading of the video file is natively supported by the Video Player component.</p>
+<p>Many aspects of this game were visualized through the use of Unity's powerful Gizmo system including the Custom Terrain, Camera Bounds and Player information.</p>
+
+<p>Finally, the loading of the files was achieved through the use of the <b>UnityWebRequest</b> class which loads a file from a URL which supports both HTTP and File protocols. The loading of the video file is natively supported by the Video Player component. There is also a Refresh Button on the Menu so that you don't need to restart the game to load new files!</p>
 
 <h1>References</h1>
 <ul>
