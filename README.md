@@ -120,8 +120,8 @@ private static Vector2 _goodAxis;
 
 <h1>References</h1>
 <ul>
-    <li><b>Star Fox 64</b> by <i>Nintento<i></li>
-    <li><b><b>Minim for Processing</b> by <i>ddf/Compartmental</i></li>
+    <li><b>Star Fox 64</b> by <i>Nintento</i></li>
+    <li><b>Minim for Processing</b> by <i>ddf/Compartmental</i></li>
     <li><b>Unity Docs</b></li>
     <li><b>Stackoverflow</b></li>
 </ul>
@@ -137,19 +137,8 @@ private static Vector2 _goodAxis;
  <li>Interchangable Video and Audio files</li>
  <li>Support for MP3 files thanks to NAudio!</li>
 </ul>
-<h1>Required Asset Overview</h1>
-<ol>
- <li>Player 3D Asset (Possibly a spaceship of some kind)</li>
- <li>Weapon asset</li>
- <li>Possibly an enemy asset although enemies are planned to have procedurally-generated visuals</li>
-</ol>
-<h1>Current Development Milestones</h1>
-<ul>
- <li>Project was created.</li>
- <li>AudioBehaviour class created (Abstract class exposing certain methods and fields to aid visualization.)</li>
-</ul>
 <h1>Gameplay Demo</h1>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/oLE2dOjXtI4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[![YouTube](http://img.youtube.com/vi/oLE2dOjXtI4/0.jpg)](https://www.youtube.com/watch?v=oLE2dOjXtI4)
 <h1>Controls</h1>
 <ul>
         <li><b>WSAD</b>: Move</li>
