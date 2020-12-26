@@ -157,6 +157,7 @@ private static Vector2 _goodAxis;
  <li> Mark Heath - NAudio - I love you.</li>
 </ul>
 <h2>This is <b><u>NOT</u></b> a commercial project. It is completely free and always will be.</h2>
+<h2>This assignment was created on an Educational Unity License</h2>
 
 <h1>Previous Proposal</h1>
 <p>This'll be a bullet-hell 3D game for which the enemies and certain parts of the map will be either randomly generated, generated based off spectrum data from an audio file of choice or preset but will react to music. The surrounding landscape will also change based on the audio file provided. The music will be freely interchangable by the player/user and most of the map will be generated as the music plays. There will be a length restriction placed on the imported audio file as to avoid both too long and too short clips.This assignment will be developed through the use of the <b>Unity 2019.4.1f1</b> Game Engine.</p>
