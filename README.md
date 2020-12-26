@@ -4,7 +4,7 @@
 <h2>Class Group: <b>DT508</b></h2>
 
 <h1>CONTENT WARNING</h1>
-<h2>This project contains a large amount of flashing lights which may trigger seizures in the vulnerable. Viewer discretion is advised!
+<h2>This project contains a large amount of flashing lights which may trigger seizures in the vulnerable. Viewer discretion is advised!<h2>
 
 <p>Unity Version: <b>Unity 2019.4.1f1</b>
 <p>This project is being made for educational purposes only.</p>
