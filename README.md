@@ -138,7 +138,7 @@ private static Vector2 _goodAxis;
  <li>Support for MP3 files thanks to NAudio!</li>
 </ul>
 <h1>Gameplay Demo</h1>
-[![YouTube](http://img.youtube.com/vi/oLE2dOjXtI4/0.jpg)](https://www.youtube.com/watch?v=oLE2dOjXtI4)
+<a href="https://www.youtube.com/watch?v=oLE2dOjXtI4"><img src="http://img.youtube.com/vi/oLE2dOjXtI4/0.jpg" title="Game Engines 1 Assignment Submission - Space Game Thing"/></a>
 <h1>Controls</h1>
 <ul>
         <li><b>WSAD</b>: Move</li>
